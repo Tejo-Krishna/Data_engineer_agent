@@ -1,0 +1,80 @@
+
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: dataeng_postgres
+    environment:
+      POSTGRES_DB: dataeng
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d dataeng"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: dataeng_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  langfuse:
+    image: langfuse/langfuse:latest
+    container_name: dataeng_langfuse
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://user:pass@postgres:5432/dataeng
+      NEXTAUTH_SECRET: devsecret-change-in-production
+      SALT: devsalt-change-in-production
+      NEXTAUTH_URL: http://localhost:3000
+      TELEMETRY_ENABLED: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/api/public/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  mcp_server:
+    build:
+      context: .
+      dockerfile: mcp_server/Dockerfile
+    container_name: dataeng_mcp_server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./domain_rules:/app/domain_rules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  postgres_data:

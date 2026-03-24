@@ -1,0 +1,54 @@
+domain: retail
+
+detection_keywords:
+  - product
+  - sku
+  - category
+  - inventory
+  - stock
+  - order
+  - customer
+  - purchase
+  - basket
+  - checkout
+  - shipping
+  - delivery
+  - return
+  - refund
+  - coupon
+  - promotion
+  - loyalty
+  - store
+  - channel
+  - online
+  - quantity
+  - unit_price
+  - total_price
+  - discount
+
+sensitive_columns:
+  - customer_id
+  - customer_email
+  - customer_name
+  - address
+  - payment_card_last4
+
+required_transforms:
+  - strip_currency_symbols_from_price_columns
+  - standardise_dates_to_iso8601
+  - deduplicate_by_order_id
+  - normalise_country_names             # UK/uk/United Kingdom → UK
+  - flag_negative_quantities_as_returns # Negative qty rows get is_return=True
+
+forbidden_transforms:
+  - drop_negative_quantity_rows         # Negatives are returns, not errors
+  - drop_null_rows                      # Null discount_pct is valid (no discount applied)
+
+validation_rules:
+  unit_price_non_negative: "unit_price columns must be >= 0 after currency stripping"
+  quantity_check: "Quantity may be negative only when is_return=True"
+  discount_range: "discount_pct must be between 0 and 100 when not null"
+  date_iso8601: "All date columns must be ISO 8601 after transformation"
+  country_canonical: "country must be one of the canonical values after normalisation"
+
+default_watermark_column: transaction_date

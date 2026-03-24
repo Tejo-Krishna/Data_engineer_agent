@@ -1,0 +1,52 @@
+domain: financial
+
+detection_keywords:
+  - price
+  - amount
+  - revenue
+  - transaction
+  - payment
+  - invoice
+  - balance
+  - account
+  - tax
+  - currency
+  - gbp
+  - usd
+  - eur
+  - fee
+  - discount
+  - refund
+  - credit
+  - debit
+  - ledger
+  - profit
+  - loss
+  - margin
+
+sensitive_columns:
+  - account_number
+  - card_number
+  - iban
+  - sort_code
+  - cvv
+  - tax_id
+  - vat_number
+  - bank_account
+
+required_transforms:
+  - strip_currency_symbols_from_numeric_columns
+  - standardise_transaction_dates_to_iso8601
+  - deduplicate_by_transaction_id
+
+forbidden_transforms:
+  - drop_null_rows          # Null financial rows may indicate reversals or pending items
+  - drop_duplicate_rows     # Use deduplicate_by_transaction_id instead — duplicates need audit trail
+
+validation_rules:
+  amount_non_negative: "All amount/price columns must be >= 0 after transformation (returns handled via is_returned flag)"
+  currency_code_format: "Currency codes must be ISO 4217 three-letter format (GBP, USD, EUR)"
+  transaction_id_unique: "transaction_id must be unique after deduplication"
+  date_iso8601: "All date columns must be ISO 8601 (YYYY-MM-DD) after transformation"
+
+default_watermark_column: transaction_date

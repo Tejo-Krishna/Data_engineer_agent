@@ -1,0 +1,58 @@
+domain: medical
+
+detection_keywords:
+  - patient
+  - diagnosis
+  - icd
+  - prescription
+  - medication
+  - dosage
+  - clinical
+  - hospital
+  - admission
+  - discharge
+  - procedure
+  - nhs
+  - lab
+  - test
+  - result
+  - symptom
+  - treatment
+  - physician
+  - doctor
+  - nurse
+  - vital
+  - blood
+  - glucose
+  - blood_pressure
+  - heart_rate
+
+sensitive_columns:
+  - patient_id
+  - nhs_number
+  - date_of_birth
+  - full_name
+  - address
+  - postcode
+  - diagnosis_code
+  - medication_name
+  - prescription_id
+  - gp_code
+
+required_transforms:
+  - fill_null_strings_with_unknown    # Missing clinical values must be recorded, not dropped
+  - standardise_dates_to_iso8601
+  - normalise_icd_codes_to_uppercase
+
+forbidden_transforms:
+  - drop_null_rows           # Null medical records must be preserved with unknown markers
+  - drop_duplicate_rows      # Duplicate patient records require clinical review, not silent deletion
+  - mask_or_hash_pii         # PII handling is managed by the data governance layer, not the pipeline
+
+validation_rules:
+  no_negative_ages: "Patient age columns must be >= 0"
+  icd_format: "ICD codes must follow ICD-10 format (letter + 2-5 digits)"
+  date_iso8601: "All date columns must be ISO 8601 after transformation"
+  null_filled: "No column may have null_rate > 0 after applying fill_null_strings_with_unknown"
+
+default_watermark_column: admission_date

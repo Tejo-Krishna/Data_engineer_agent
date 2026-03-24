@@ -1,0 +1,55 @@
+domain: employment
+
+detection_keywords:
+  - employee
+  - staff
+  - salary
+  - wage
+  - payroll
+  - department
+  - job_title
+  - hire_date
+  - termination
+  - contract
+  - hours
+  - overtime
+  - leave
+  - absence
+  - appraisal
+  - manager
+  - headcount
+  - fte
+  - grade
+  - band
+  - pension
+  - ni_number
+  - national_insurance
+
+sensitive_columns:
+  - employee_id
+  - national_insurance_number
+  - ni_number
+  - salary
+  - date_of_birth
+  - full_name
+  - address
+  - bank_account
+  - emergency_contact
+
+required_transforms:
+  - title_case_name_columns             # Employee names to Title Case
+  - standardise_dates_to_iso8601
+  - normalise_department_names          # Trim whitespace, consistent casing
+  - deduplicate_by_employee_id
+
+forbidden_transforms:
+  - drop_null_rows                      # Null salary or dates may be valid for contractors/pending hires
+  - expose_salary_in_logs               # Salary columns must never appear in log output or reports
+
+validation_rules:
+  salary_non_negative: "Salary and wage columns must be >= 0"
+  hours_range: "Weekly hours must be between 0 and 168"
+  date_iso8601: "All date columns must be ISO 8601 after transformation"
+  no_future_hire_date: "hire_date must not be in the future"
+
+default_watermark_column: hire_date

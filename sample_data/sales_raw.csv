@@ -1,0 +1,501 @@
+transaction_id,customer_id,product_name,quantity,unit_price_gbp,transaction_date,country,payment_method,discount_pct,is_returned
+236c25d6-390b-402b-8948-abd60b065614,CUST-1520,Wireless Headphones,7,223.75,2024-11-23,Sweden,debit_card,3.1,False
+5977f099-fe45-4524-aa0e-2b588042ba7b,CUST-7924,Webcam HD,3,12.82,29/04/2024,United Kingdom,debit_card,16.3,0
+c43c5d28-ba47-436f-b6b2-a93ded9db00d,CUST-3045,Screen Cleaner Kit,9,£104.29,20/04/2024,netherlands,credit_card,25.4,False
+f087ea36-a8eb-44f9-a757-5613b44bb3b2,CUST-4814,Mouse Pad XL,2,190.44,2024-10-09,France,bank_transfer,5.8,True
+eccd5f47-3ce2-4ecd-9477-75fb6ffdd35c,CUST-9751,Desk Lamp,3,251.05,2024-05-22,Sweden,debit_card,20.1,False
+d1af6aa4-640b-4ab6-88af-7d308a0b7045,CUST-6168,Laptop Stand,1,296.90,2024-08-24,GERMANY,credit_card,20.5,False
+a78061a9-68ac-4a6c-86a4-974248cafef7,CUST-3287,Gaming Mouse,5,172.31,18/04/2024,GERMANY,voucher,15.0,0
+cdfd0010-b376-462b-8f1e-8612b7c9121e,CUST-3621,Cable Organiser,3,122.81,07/08/2024,united kingdom,voucher,15.3,False
+f4c1ea7f-fc0d-424a-8c8b-e8b8b3005306,CUST-6573,USB-C Hub,5,180.78,2024-02-02,sweden,bank_transfer,16.6,False
+0e705946-d987-4b1b-a176-3d7b670381b3,CUST-4258,Mechanical Keyboard,9,286.37,2024-03-21,france,debit_card,15.0,False
+c04f88ff-e1d8-4e75-8ed3-dc0fff52d81f,CUST-1949,Gaming Mouse,4,277.11,03/10/2024,FRANCE,credit_card,14.7,0
+5c1d8d0c-23f6-41e0-91c6-c8346112269d,CUST-7932,Gaming Mouse,9,245.72,13/02/2024,FRANCE,debit_card,3.8,False
+9dff2b36-528d-4120-b54f-aa9e4b221527,CUST-4770,Ethernet Cable,1,203.14,2024-06-08,France,credit_card,13.5,False
+ec853fec-9220-472c-a9a0-4f3f0a16d8e9,CUST-4510,RAM 16GB,8,£22.36,06/02/2024,France,voucher,,False
+baeee720-83a0-44f8-9fb4-23d8f5b9d71a,CUST-1887,HDMI Adapter,8,236.45,2024-10-22,The Netherlands,credit_card,2.9,0
+f053c2af-2dd8-480a-af84-74ca56e4a3b9,CUST-8579,Gaming Mouse,5,105.08,2024-02-01,Germany,bank_transfer,5.7,0
+483d0601-7772-4b2a-8c50-698a725e001b,CUST-8956,SSD 1TB,7,197.37,2024-10-08,germany,bank_transfer,,False
+aa69a6ea-35f3-4145-956c-7545821dd8dd,CUST-5861,Gaming Mouse,4,5.63,2024-01-31,Germany,voucher,23.6,0
+3b464f5e-1ab2-472b-b401-6b8a959eecab,CUST-4044,USB-C Hub,2,£97.50,2024-10-04,SWEDEN,credit_card,27.6,False
+bfe5df32-8af8-4b2e-934d-c2355165183a,CUST-9565,Webcam HD,10,124.10,11/12/2024,netherlands,debit_card,17.4,True
+fab2c3ef-4a96-4ac7-afa0-2374bca5eddd,CUST-2638,USB-C Hub,8,75.40,08/12/2024,U.K.,debit_card,9.0,False
+6b47e812-556b-4314-9224-74262891b3c0,CUST-1128,HDMI Adapter,9,280.30,2024-09-16,SWEDEN,paypal,11.1,0
+1cab2d10-cbdd-430c-b04f-1a9c8359f05e,CUST-6617,Gaming Mouse,4,264.04,2024-12-05,SWEDEN,paypal,22.3,0
+a9cc4037-9e7d-4fd0-a25a-33e6c6d8e5bc,CUST-5291,Mechanical Keyboard,3,272.06,2024-09-15,FRANCE,bank_transfer,12.7,False
+80fc3b12-3cfd-4a4c-977f-647416d17dff,CUST-3426,Laptop Stand,10,170.46,09/10/2024,France,credit_card,20.7,False
+352b5e2b-c979-4f06-a1c6-a7a2e3ea7730,CUST-7658,Ethernet Cable,6,280.25,2024-06-06,uk,debit_card,,False
+3c95dc6b-ca63-4b51-8763-2be97586ef8a,CUST-5371,Mechanical Keyboard,4,244.17,24/03/2024,The Netherlands,credit_card,,0
+c66744f9-0c89-4230-a58b-b25bf5caa9b0,CUST-4164,Laptop Stand,1,258.28,14/07/2024,GERMANY,paypal,13.8,False
+7f22ee3b-65b0-414a-8b31-cfd4eefc5ec0,CUST-3925,Ethernet Cable,5,87.33,05/02/2024,United Kingdom,credit_card,29.4,False
+8c4c44fb-a1a1-41d5-b600-79b66c272045,CUST-8144,Wireless Headphones,1,106.97,25/02/2024,FRANCE,voucher,29.5,False
+6cd42861-bf42-4941-aad6-a0fc4d3675fd,CUST-3041,Desk Lamp,6,223.87,17/12/2024,sweden,voucher,2.1,0
+41255bf6-1b04-4a18-b292-777436c395c5,CUST-5930,Laptop Stand,10,101.21,07/06/2024,Germany,paypal,5.8,0
+d4b2b6e6-17d8-441e-b712-4f277248c68a,CUST-5649,RAM 16GB,2,236.79,2024-05-26,GERMANY,credit_card,13.3,0
+7b350d07-2aa1-48b3-a60f-0e0c3dd5d7ce,CUST-8461,Laptop Stand,2,71.26,30/04/2024,SWEDEN,voucher,,0
+dfca24a5-f07d-43d8-b738-cda22241444b,CUST-3881,Cable Organiser,4,118.26,09/04/2024,The Netherlands,voucher,20.6,False
+2145b44b-dc63-44f7-a8d9-52aaa3d32bc5,CUST-9270,Laptop Stand,10,78.50,2024-08-25,The Netherlands,bank_transfer,24.0,0
+21ca1364-99c9-40c9-9f62-f62ed602cd7a,CUST-8206,USB-C Hub,5,145.02,22/03/2024,GERMANY,debit_card,19.1,0
+89d05677-835e-4291-b3c4-7aa2fac03d1b,CUST-7678,Webcam HD,7,£268.43,2024-05-19,U.K.,bank_transfer,11.5,False
+c7711061-23ff-4a7f-86c0-463b3aa1d371,CUST-6763,Monitor Stand,1,250.69,2024-07-31,netherlands,bank_transfer,28.4,1
+8bd2ba76-117c-4357-906e-d413599cbb86,CUST-7624,Desk Lamp,6,166.10,02/10/2024,Netherlands,bank_transfer,6.6,False
+89c4f9a8-f4a2-4cf1-9bc1-baf60d6b5060,CUST-3977,Wireless Headphones,8,162.56,06/03/2024,GERMANY,bank_transfer,19.9,0
+035ebabc-fd8c-404f-bf2f-3054c7fd826d,CUST-1317,Desk Lamp,8,101.41,2024-06-16,U.K.,credit_card,22.6,0
+56c7b400-617d-4e34-a811-1ec246499b2a,CUST-3496,Gaming Mouse,1,25.23,2024-06-28,germany,bank_transfer,,True
+0d63665d-0dba-46a3-ad8a-333bdea9c893,CUST-2771,Ethernet Cable,5,284.58,2024-12-08,Germany,paypal,11.1,False
+a968cfb3-1037-4ee5-a856-9313c55d44c5,CUST-2983,Cable Organiser,5,287.65,21/10/2024,U.K.,credit_card,2.3,False
+4edc05e7-7f94-4ac0-986e-bac42a970b4d,CUST-6934,HDMI Adapter,7,£200.14,26/06/2024,united kingdom,debit_card,0.4,0
+4fbde1c4-4bee-4f64-9679-221a2ad4fcca,CUST-5397,Webcam HD,10,158.91,2024-08-10,Netherlands,credit_card,27.6,0
+bb603cec-9a72-4c61-93c7-b603beed7450,CUST-4475,Webcam HD,-2,76.93,22/05/2024,GERMANY,paypal,11.4,1
+a214634d-fcf3-4814-83c8-7291bcd6a6a4,CUST-9004,RAM 16GB,7,211.84,23/05/2024,germany,bank_transfer,,False
+31c131cd-9d2e-4821-b9d0-e91844ae52ee,CUST-9698,Webcam HD,9,£137.20,26/11/2024,netherlands,voucher,12.1,0
+60ffe6bf-db22-46fc-852e-5736cfd018f8,CUST-8933,Monitor Stand,4,138.84,2024-06-18,GERMANY,credit_card,21.6,False
+42b9f0fa-ef84-4c3c-a3d9-048e1d0554ad,CUST-3068,HDMI Adapter,5,111.45,2024-04-09,sweden,credit_card,3.8,True
+2c13e3ea-b6c1-44b7-aa37-5d154bd3eaf2,CUST-7565,SSD 1TB,2,143.46,07/01/2024,UK,voucher,1.5,0
+48ac332b-d1ec-43ad-aa27-780ea652c3d6,CUST-4697,Cable Organiser,10,49.75,18/11/2024,SWEDEN,bank_transfer,2.6,0
+97ad85e2-0c16-4ede-83fe-a9e7f691627b,CUST-5335,HDMI Adapter,4,92.71,18/08/2024,Germany,debit_card,17.1,True
+468af724-d996-444b-88e2-44b40bd21bc4,CUST-8438,USB-C Hub,5,£27.13,2024-05-02,FRANCE,debit_card,17.8,False
+d336790b-5f76-436b-8f53-a32ccdfbec59,CUST-2169,Wireless Headphones,3,189.38,15/05/2024,France,paypal,12.8,False
+16727b43-f956-4b33-b9da-a08c0c615e19,CUST-9090,SSD 1TB,9,172.91,31/10/2024,Sweden,voucher,20.7,0
+b2ba042d-64a5-413e-bf2f-1cc35b196af8,CUST-1659,Cable Organiser,10,221.68,21/01/2024,France,bank_transfer,,False
+7ec3c641-f4e5-4ae9-8e34-22348608be54,CUST-7690,Webcam HD,6,275.23,22/09/2024,netherlands,credit_card,19.0,False
+ec35d356-b085-4c13-b76a-6e481fb34891,CUST-5135,Webcam HD,6,209.62,2024-03-23,UK,bank_transfer,24.4,0
+27bf7b23-a1f2-4fad-96e7-500453e6d6f7,CUST-4335,Monitor Stand,1,5.33,20/09/2024,The Netherlands,debit_card,1.6,0
+b27e65b7-7466-4bdd-bbb5-a35e5ed1aaa8,CUST-1224,RAM 16GB,9,210.97,2024-05-27,france,credit_card,18.3,False
+4cb8089c-48fe-4dc2-9a96-4f20716c32bf,CUST-7807,Mouse Pad XL,5,274.30,25/04/2024,sweden,bank_transfer,25.0,0
+879858fe-1f6b-4d2e-8eea-d05e88e0a4ef,CUST-6568,Screen Cleaner Kit,7,47.66,2024-05-04,FRANCE,paypal,22.4,False
+c3635534-9935-4515-9289-a39f6dbf4f22,CUST-9903,Laptop Stand,6,93.06,2024-01-02,france,paypal,14.7,0
+4ecf8428-2f09-48d0-8637-f5abfc22d88e,CUST-3492,SSD 1TB,7,75.44,06/04/2024,Netherlands,debit_card,12.3,0
+cad8dfa2-21a7-414b-bc5a-d24c69a39c8e,CUST-3529,USB-C Hub,7,102.93,14/09/2024,Deutschland,paypal,3.0,False
+81d07ae9-1b08-435e-aa70-7086975cd5c6,CUST-1588,Ethernet Cable,9,£122.25,22/06/2024,Netherlands,debit_card,20.2,0
+8cfe2dfe-4790-419a-9215-ef5707fbc385,CUST-5906,Screen Cleaner Kit,3,89.77,19/11/2024,Netherlands,credit_card,29.4,False
+c2721f1a-33e9-4568-9e71-bc7e7b9d7768,CUST-2293,Ethernet Cable,3,91.53,15/06/2024,Deutschland,voucher,15.9,False
+c25644c3-12ac-4f08-86f8-ebe97c053db3,CUST-9955,Mechanical Keyboard,5,274.27,2024-12-15,Netherlands,bank_transfer,7.6,False
+bb7df356-be63-4e43-8476-33d487cd12eb,CUST-4886,Laptop Stand,2,93.24,25/06/2024,The Netherlands,paypal,13.7,0
+dd8ae633-3ecf-4bd3-9cc2-9561942ff609,CUST-5689,Cable Organiser,8,£211.28,2024-10-21,Sweden,voucher,11.9,True
+b34ecd52-3997-4ebe-867f-1652c9795ee7,CUST-6061,Cable Organiser,1,61.08,2024-06-29,united kingdom,credit_card,23.0,False
+b4e45f2d-2da3-4c13-8585-e733c429c759,CUST-5465,Mouse Pad XL,9,43.76,2024-10-23,Sweden,paypal,12.5,0
+828c0b4a-ca1f-4bfd-8a04-e658adcfc71d,CUST-6992,USB-C Hub,9,92.06,03/09/2024,netherlands,credit_card,14.0,True
+59a39a4c-2f35-4424-98a9-204bba4b5b9d,CUST-8724,Wireless Headphones,4,139.15,15/05/2024,U.K.,voucher,17.5,0
+9792e782-c012-4d63-9c29-a84a3ddfb962,CUST-1742,Wireless Headphones,3,£70.29,16/06/2024,United Kingdom,bank_transfer,27.3,0
+f2e56b79-a5dc-4386-8787-15c6ac6b6302,CUST-7797,HDMI Adapter,3,266.73,2024-02-29,Sweden,bank_transfer,20.1,0
+2be56b8f-4547-49f8-99c3-919b92deffb4,CUST-9920,Screen Cleaner Kit,6,£285.69,2024-11-11,United Kingdom,credit_card,13.3,0
+cfbf0ac2-4cd9-4665-9294-eccb57ece1c8,CUST-4990,Mechanical Keyboard,6,290.61,2024-07-22,U.K.,debit_card,2.8,False
+8df4780a-92d5-4224-870e-050468d25117,CUST-3129,RAM 16GB,3,168.48,05/02/2024,france,debit_card,7.0,False
+8426d88b-a6ae-4de6-9bec-24e726145461,CUST-3076,Desk Lamp,1,£12.60,26/02/2024,france,voucher,7.1,False
+7afce5fa-fa96-4ec9-b703-c0077fc2cb57,CUST-8504,HDMI Adapter,5,145.48,28/02/2024,Sweden,credit_card,3.3,False
+dccdce7a-6632-41ed-a854-568d33eb4afe,CUST-2076,Mechanical Keyboard,3,130.74,02/09/2024,sweden,voucher,13.3,0
+a68523a1-88db-406e-bf4d-8e8bce78cd1d,CUST-4522,Laptop Stand,2,215.08,20/11/2024,united kingdom,debit_card,8.8,0
+b1aad60b-52f6-43e9-aec9-3122c79d66da,CUST-2099,USB-C Hub,8,138.77,2024-07-30,Germany,credit_card,12.8,0
+b88dd219-b7ce-4b51-ae83-f634e0bff860,CUST-6793,Mouse Pad XL,7,222.93,2024-08-09,united kingdom,credit_card,17.6,0
+fa0c7a2b-9131-4d37-b0be-e6a496b0eb60,CUST-7022,USB-C Hub,9,108.73,27/05/2024,france,voucher,19.7,False
+0dfda028-998c-4c8e-9745-13248ccad192,CUST-1474,Mechanical Keyboard,5,254.31,25/04/2024,sweden,paypal,18.4,False
+6147d766-1523-438e-a1a6-57587918e82d,CUST-4524,Laptop Stand,9,58.50,2024-06-22,united kingdom,bank_transfer,2.1,False
+11e5cd4f-85bc-438b-88ec-804d53de5a18,CUST-1815,HDMI Adapter,10,96.92,2024-06-23,Germany,paypal,17.9,False
+f90730fc-0bf3-4a65-98bc-d2fa7d977f33,CUST-8972,RAM 16GB,5,148.26,14/08/2024,United Kingdom,credit_card,22.6,0
+e9c06c8a-c648-4c5c-8fc4-ebecb171c119,CUST-2965,Wireless Headphones,6,£181.79,2024-04-22,france,bank_transfer,6.3,0
+6b4dab03-8518-46af-bc05-80d0642b4fa0,CUST-1307,SSD 1TB,7,162.10,2024-03-30,UK,paypal,20.0,0
+f2d53a89-9369-4107-8544-58022ad92929,CUST-6928,USB-C Hub,8,124.29,2024-10-21,sweden,credit_card,12.2,False
+e26ffcc9-0680-4a17-ac7a-767a6e1550f1,CUST-2868,RAM 16GB,9,£123.12,2024-05-04,U.K.,debit_card,22.4,False
+3c18a764-2c65-4bac-b271-9e233b0e41c6,CUST-2234,Mechanical Keyboard,3,287.67,2024-06-27,SWEDEN,bank_transfer,3.1,False
+c08e92b0-52ce-4a15-b693-ba2d78c591a4,CUST-8205,USB-C Hub,3,229.15,25/08/2024,france,bank_transfer,16.9,0
+1e005551-f121-425e-821b-0a77fb7ac7ad,CUST-2257,HDMI Adapter,5,£86.02,2024-11-19,France,voucher,9.3,False
+a761c476-560d-4eea-9f18-4d07e6dd6d8e,CUST-8792,RAM 16GB,10,141.49,31/10/2024,France,credit_card,26.9,False
+297c914e-a24c-4c96-acc5-20b6561bb5e0,CUST-9586,RAM 16GB,8,270.23,2024-08-18,The Netherlands,debit_card,15.1,False
+83acd89a-f32e-411e-9621-43d5ed8994fb,CUST-2548,RAM 16GB,6,88.44,2024-07-05,united kingdom,paypal,17.9,0
+5880389e-2470-4693-b88d-4cf511e6dbea,CUST-7421,Mechanical Keyboard,5,198.68,09/05/2024,FRANCE,credit_card,10.0,False
+8032f2bc-e315-4e6d-bd4f-aad96dcf388b,CUST-6928,Wireless Headphones,9,194.82,07/06/2024,netherlands,paypal,21.1,False
+19a7fcec-ecf1-428e-bb58-ca6ecc2a77d8,CUST-9843,Mouse Pad XL,9,105.80,02/04/2024,U.K.,credit_card,30.0,0
+a6acfae0-bd07-44fb-8a09-c87e07330d18,CUST-7731,Webcam HD,1,231.05,2024-12-04,The Netherlands,debit_card,4.9,False
+0a7359ef-0ddf-48a0-a412-86cf73d1521f,CUST-8218,SSD 1TB,6,226.95,15/08/2024,GERMANY,bank_transfer,7.2,0
+5c57eaf5-935e-4dde-b31b-3f9cdd124005,CUST-2680,Desk Lamp,9,290.04,14/09/2024,FRANCE,credit_card,4.2,0
+bd4e6291-0c27-46f8-b2c8-4f346ca496d1,CUST-1436,Laptop Stand,6,52.28,2024-05-25,Netherlands,bank_transfer,24.9,False
+c09bcc3f-9092-4dfb-b92f-22b3ef6a26ea,CUST-1627,Monitor Stand,3,£118.91,2024-09-14,Deutschland,debit_card,9.6,0
+ca934630-0fc6-4acc-b83b-9c2b70400649,CUST-9647,Laptop Stand,10,186.52,2024-12-27,Sweden,paypal,,False
+4cf7d0ef-8d88-4f0c-8192-6e7a79755268,CUST-1269,HDMI Adapter,9,19.08,2024-05-01,SWEDEN,voucher,13.7,0
+62e4e0bb-0ff1-4495-af3f-ff2cbc15359c,CUST-2108,RAM 16GB,6,£90.92,03/05/2024,SWEDEN,voucher,17.1,False
+a4f12b4a-9df5-4ab1-a3d1-9a7e3c37eeaf,CUST-6649,Gaming Mouse,2,120.17,16/09/2024,FRANCE,credit_card,29.4,False
+f0ee71bb-48ba-4b2b-bbbd-898b10028bf7,CUST-3209,USB-C Hub,3,£103.08,24/10/2024,The Netherlands,bank_transfer,24.4,0
+883c3edf-d8d7-4e7e-9698-22010babd67e,CUST-5150,Wireless Headphones,8,17.91,2024-01-19,SWEDEN,debit_card,,0
+13bd7e8c-2b77-4864-a599-8494f13bb5f2,CUST-6554,Mechanical Keyboard,7,235.34,2024-05-26,netherlands,bank_transfer,3.7,0
+ebd11374-35a8-40d5-881b-65c1070c0527,CUST-6262,USB-C Hub,5,158.18,07/07/2024,Sweden,paypal,2.4,False
+c7d348ee-b13f-4530-973c-87bc2032fc7e,CUST-5498,HDMI Adapter,7,136.54,2024-12-04,Sweden,credit_card,13.3,0
+abfa2239-31f7-4c1a-bfce-31966981db0b,CUST-2101,Gaming Mouse,3,112.17,09/12/2024,United Kingdom,paypal,28.6,0
+1417c461-9a69-4f52-b366-fbf077e36b49,CUST-9674,Webcam HD,3,14.54,15/07/2024,sweden,paypal,11.1,False
+daa4357d-7c19-4c22-a1ea-f6fe1d5415a8,CUST-8311,Gaming Mouse,5,£288.34,2024-11-28,FRANCE,paypal,15.5,False
+9bc1febd-b130-4f97-bf7b-37141966d631,CUST-6692,Desk Lamp,6,149.89,21/12/2024,UK,voucher,13.6,0
+dfeb46eb-6f70-469b-b2a1-7b698c1b9abd,CUST-2988,Gaming Mouse,4,93.48,2024-10-04,Sweden,debit_card,21.0,0
+7074a7f2-1a74-4919-a057-23ced49f7db0,CUST-7523,Desk Lamp,5,168.43,2024-09-09,united kingdom,voucher,16.5,False
+294012fa-4074-4e2b-9296-1c771d616eba,CUST-3981,Cable Organiser,9,£247.88,29/07/2024,germany,bank_transfer,19.3,0
+17f299a6-8df6-4afa-b691-fa054e65d398,CUST-5653,Mouse Pad XL,9,21.34,14/09/2024,France,paypal,4.9,False
+6e58f01b-5875-4dcd-baf0-c60df84e0f52,CUST-3526,Mechanical Keyboard,10,167.49,10/04/2024,SWEDEN,voucher,16.0,False
+85d29d66-69f2-4125-a447-741e8fdf439f,CUST-7825,Ethernet Cable,10,£277.55,2024-11-05,Germany,bank_transfer,2.4,0
+63a1de79-fb76-443e-ad74-be329bbc1cc2,CUST-3589,SSD 1TB,1,194.35,17/11/2024,united kingdom,bank_transfer,24.2,0
+3ccfad60-eb73-4ebc-9baa-30c6ed504176,CUST-9437,RAM 16GB,6,183.95,2024-08-25,Germany,paypal,22.0,0
+7eb0e820-2913-43a8-864d-4a44b80b70a4,CUST-6364,Screen Cleaner Kit,3,83.89,2024-05-03,GERMANY,debit_card,8.7,0
+757ab87d-220f-4399-99b3-2c7b0e9360c5,CUST-6781,Wireless Headphones,4,156.83,2024-03-22,Germany,paypal,0.7,0
+abd47759-97d1-495d-b596-db812966fbab,CUST-7606,Webcam HD,6,253.63,10/09/2024,France,bank_transfer,0.2,False
+3ad4e5e8-f6d8-406d-9f67-820e86f9dd3e,CUST-2946,Mechanical Keyboard,10,62.41,27/01/2024,Sweden,bank_transfer,15.1,0
+b2e60f79-cb59-46f3-92a3-53ef800add45,CUST-3245,Desk Lamp,1,105.02,10/07/2024,United Kingdom,bank_transfer,6.0,False
+c12f0143-fe19-48a9-8cf0-6d6eea751249,CUST-9311,Mouse Pad XL,6,183.84,2024-09-22,SWEDEN,voucher,18.4,0
+c08f32a6-2f04-4322-aee9-73b3c964b31b,CUST-8775,Monitor Stand,10,93.43,07/09/2024,U.K.,voucher,20.2,0
+228ab301-ae34-4ea8-a5b7-e3f1b01af1d4,CUST-2800,Gaming Mouse,1,177.13,26/04/2024,Germany,bank_transfer,18.6,False
+2d23fe34-444c-46f4-8c58-8076d6be65d3,CUST-4397,RAM 16GB,9,126.81,2024-06-09,GERMANY,bank_transfer,18.3,False
+81e5d941-5e01-4d75-81d8-ffe98b5815c0,CUST-4150,Gaming Mouse,8,287.21,2024-09-26,sweden,voucher,16.4,0
+2eb647c8-df9f-48cd-b694-c89595f23c4c,CUST-5480,Monitor Stand,6,292.00,2024-06-01,Netherlands,voucher,6.2,0
+d0bd40c9-54a5-4033-95fd-1691aff70ab7,CUST-6674,Screen Cleaner Kit,2,269.24,12/12/2024,france,paypal,23.2,False
+7f900e02-25fc-4ec2-aad4-9f5deea5fd9e,CUST-9700,Gaming Mouse,1,249.24,2024-09-02,germany,credit_card,8.1,False
+e30e8d17-ad21-4808-b283-d19743ba3732,CUST-8822,HDMI Adapter,8,216.61,2024-02-21,Netherlands,paypal,0.2,False
+0d8a78cc-3d4e-4166-80de-8e7e75eea5c4,CUST-3880,Screen Cleaner Kit,7,22.44,2024-06-13,Germany,bank_transfer,7.0,False
+65702ffe-a9fd-4e1b-98fd-4c9e6e33e5a0,CUST-8444,HDMI Adapter,5,225.95,2024-09-10,FRANCE,voucher,1.1,False
+6c2dfab2-f851-40f1-9954-ab7033263ea9,CUST-1230,Desk Lamp,3,44.58,09/09/2024,france,paypal,24.3,0
+5a9e4901-02b8-4adb-90a2-979e3e00ee5e,CUST-2562,Mechanical Keyboard,7,61.97,17/10/2024,uk,bank_transfer,12.2,0
+f5efd990-d45e-4aaa-bb51-b736b5608146,CUST-4871,Wireless Headphones,6,7.00,14/06/2024,FRANCE,credit_card,8.0,False
+08645617-c9c9-4dbc-ae1f-c3564e0ad6b0,CUST-4618,Gaming Mouse,6,124.59,2024-08-26,France,bank_transfer,21.1,False
+4670498c-69fc-4126-b2fa-96e502e787bb,CUST-2341,RAM 16GB,10,296.70,2024-03-19,Deutschland,voucher,27.4,False
+943817a1-699c-443c-8274-dfe4add6c883,CUST-9525,SSD 1TB,6,275.58,2024-12-26,Germany,debit_card,27.1,False
+41445dbc-a8eb-450c-bdc8-991277b0b4f6,CUST-6049,Desk Lamp,8,270.16,2024-10-25,Sweden,bank_transfer,4.0,False
+5bb29bf1-d864-4746-bb23-2ed55acac527,CUST-2130,Screen Cleaner Kit,1,225.00,10/05/2024,sweden,credit_card,,False
+8d0de934-5287-4462-806b-49f53617d716,CUST-7154,USB-C Hub,7,231.84,2024-05-26,The Netherlands,voucher,19.4,0
+463b7161-fec1-4c3f-803d-6a10534689fa,CUST-5888,SSD 1TB,1,107.58,09/03/2024,U.K.,bank_transfer,15.9,False
+cb5b2570-6bd9-414e-9554-0a48ce7dafde,CUST-1256,Gaming Mouse,7,72.74,2024-09-29,uk,credit_card,5.7,False
+60f0cd07-c758-4eee-807c-4b55f7d3f97d,CUST-4559,Cable Organiser,9,136.69,21/02/2024,Germany,debit_card,7.3,1
+6a791ade-1e9f-42ae-83fc-01f0dcdc7b06,CUST-3347,HDMI Adapter,5,74.07,14/09/2024,germany,bank_transfer,17.3,0
+d20895db-edd1-43f9-8a05-6234eb47f427,CUST-7244,Cable Organiser,6,169.22,2024-06-02,U.K.,paypal,5.3,0
+f2ca8156-3770-4ef9-908a-878408537e00,CUST-1944,RAM 16GB,8,49.01,2024-12-22,Deutschland,bank_transfer,14.2,0
+78eb6c8c-7e82-4a36-b3ee-c5238e389016,CUST-4120,Wireless Headphones,9,119.57,12/10/2024,United Kingdom,bank_transfer,2.4,0
+245c4d27-eca0-4ff5-8562-37b11094198a,CUST-6455,Monitor Stand,4,£16.66,10/12/2024,Netherlands,debit_card,17.6,False
+07b88cd2-854c-48d9-9210-51dcc32567b9,CUST-6269,Cable Organiser,4,39.60,07/04/2024,netherlands,bank_transfer,7.3,False
+008a8543-d3cd-43a1-909d-b358e9b098cd,CUST-7073,Webcam HD,4,110.97,26/08/2024,france,credit_card,14.9,0
+e2334256-838a-403a-a10f-52078f65dd29,CUST-6404,Gaming Mouse,4,£223.66,15/10/2024,Deutschland,voucher,17.5,0
+f4c98283-9c27-474a-9a68-a89fb3a50b9c,CUST-6770,Mechanical Keyboard,3,198.10,2024-05-05,Netherlands,voucher,24.6,0
+fadd9c77-571b-426b-9e59-0aabb8182df4,CUST-7756,Mechanical Keyboard,1,267.35,2024-09-07,uk,credit_card,15.7,False
+09c8631e-1b83-468e-a570-6f9c723f3d47,CUST-1108,RAM 16GB,1,69.51,2024-12-28,The Netherlands,bank_transfer,19.1,0
+714f0ce8-0072-4b0c-ab7a-f8b09a35b204,CUST-2578,RAM 16GB,2,218.04,2024-01-07,germany,debit_card,15.1,0
+58f7c071-fee6-4b8d-8d97-77db102b0984,CUST-4700,Monitor Stand,4,79.45,08/04/2024,SWEDEN,credit_card,2.4,0
+ff597c1a-2dd8-4e7d-baee-5bdc61633add,CUST-9189,Mouse Pad XL,2,£196.71,30/11/2024,Deutschland,paypal,11.3,False
+7c21db55-da1d-4f61-814c-02b219b8a9ce,CUST-2218,HDMI Adapter,1,292.27,16/10/2024,france,voucher,6.9,0
+8ed88d1a-3063-499b-8611-2eb12e27d88d,CUST-5903,Mechanical Keyboard,2,57.90,15/10/2024,The Netherlands,debit_card,,False
+f91fb2a1-8ba1-4275-b9f2-4338eb1d35e2,CUST-1879,USB-C Hub,6,119.79,17/10/2024,sweden,debit_card,22.7,False
+031d5d0c-390c-4320-917f-2f8282cd4bf0,CUST-4737,Webcam HD,8,231.85,2024-02-08,The Netherlands,bank_transfer,23.2,1
+b938c00b-5853-4c71-bbaf-557af0b989bc,CUST-3526,Laptop Stand,5,177.82,2024-08-09,uk,bank_transfer,8.9,False
+51ab5dbc-4dad-46cf-9595-776136f866de,CUST-8353,RAM 16GB,7,31.99,2024-06-11,Deutschland,credit_card,22.8,False
+87c78209-236d-44ec-bf02-1140a3f52eb9,CUST-4977,Ethernet Cable,2,168.48,2024-01-14,The Netherlands,debit_card,25.9,1
+56bd3efe-5b5c-4db5-a54d-69202e24e707,CUST-2260,Webcam HD,8,45.95,2024-12-16,france,debit_card,1.9,0
+dc9e99e4-e771-4d4f-b037-ac8570497bd5,CUST-6484,Laptop Stand,8,186.91,2024-11-16,FRANCE,voucher,0.2,0
+4dcdcacc-73c8-4630-b758-e572a3a7be3d,CUST-4971,Webcam HD,8,182.94,2024-03-10,france,paypal,5.3,0
+692c2fdb-0079-487c-9d4d-f230bc3ce39b,CUST-8183,Cable Organiser,4,279.95,2024-07-20,netherlands,credit_card,5.4,False
+4e068c3b-b901-4b6b-8604-5a0c08faa421,CUST-8851,Ethernet Cable,8,46.05,28/07/2024,united kingdom,voucher,4.6,0
+60805436-ba01-4650-b789-b4bfa406779e,CUST-6816,Mechanical Keyboard,4,261.53,16/09/2024,U.K.,credit_card,,False
+dd07158d-15bd-45c1-bf94-936bc263c541,CUST-4637,RAM 16GB,5,204.84,15/10/2024,U.K.,voucher,29.0,False
+ff85c7ef-d60e-419a-ba6a-c0ee45ae227c,CUST-8909,USB-C Hub,1,70.19,24/10/2024,france,bank_transfer,20.4,False
+15c9d889-6576-4eb3-877c-e23c9908010d,CUST-2599,SSD 1TB,8,282.49,2024-02-13,FRANCE,bank_transfer,13.7,0
+e235249a-06e3-4b22-b225-e3c8ab5dc821,CUST-9454,Mechanical Keyboard,4,18.17,2024-06-12,germany,paypal,,False
+7bfb5683-5c51-4277-8f60-33c11163ad36,CUST-4232,SSD 1TB,10,141.30,2024-10-13,U.K.,bank_transfer,5.6,0
+404751be-a247-452a-afbe-088ad74a420c,CUST-4228,SSD 1TB,6,68.35,2024-07-18,France,paypal,23.9,False
+0e4afe3f-60c4-4c67-81b0-e30414822e2a,CUST-3826,Mouse Pad XL,8,160.67,09/12/2024,FRANCE,paypal,18.3,0
+59e71e8a-3f86-494b-855b-844d2b36bedc,CUST-7852,Ethernet Cable,7,203.26,10/11/2024,Sweden,voucher,3.5,False
+d9b811a8-a09d-404f-9872-ef6e6f39c661,CUST-3298,Mechanical Keyboard,5,148.56,2024-07-15,netherlands,bank_transfer,27.9,False
+eb979f8e-43a7-4e70-b1b6-83fff801638a,CUST-7809,Desk Lamp,8,£110.91,2024-11-13,netherlands,bank_transfer,24.5,0
+ec8b694f-c0d7-4e45-bc8f-7855c752c35e,CUST-9115,RAM 16GB,10,14.09,2024-03-26,The Netherlands,credit_card,8.2,False
+968347c6-9cae-4885-8bf8-b514ac98016e,CUST-7965,USB-C Hub,4,233.65,2024-10-20,SWEDEN,debit_card,24.7,1
+e2241d12-9d47-4297-8615-95a3eb045444,CUST-6744,Mouse Pad XL,4,14.50,01/06/2024,Deutschland,debit_card,2.6,False
+19303dd8-0f6c-4896-a7ce-693e67b32c0d,CUST-5740,Ethernet Cable,5,65.94,2024-11-11,france,voucher,10.5,False
+3607fbfb-d796-4196-8f6e-0f2288ccddb4,CUST-3396,Desk Lamp,4,44.99,13/12/2024,GERMANY,debit_card,1.8,False
+fe7c5982-fc5e-4520-9ae0-7f0f95070886,CUST-5558,Desk Lamp,-1,46.93,2024-12-12,netherlands,bank_transfer,11.3,True
+6e57236e-cf96-49b1-b1e6-a90094bc0ea4,CUST-7516,Gaming Mouse,9,5.72,2024-09-06,united kingdom,debit_card,21.9,0
+09e2f567-e47e-47b1-8e33-b520e45f5e02,CUST-2631,HDMI Adapter,1,249.35,2024-09-10,united kingdom,credit_card,17.0,0
+404019d8-d07f-4118-a013-8b3aaf16caf0,CUST-5489,USB-C Hub,3,51.60,04/03/2024,FRANCE,paypal,12.8,False
+ab1a5253-dbe0-4354-bb32-89cac9aea2a9,CUST-2559,Wireless Headphones,2,201.02,2024-05-08,Netherlands,bank_transfer,18.8,False
+6e03109f-0c9d-41bb-aacc-ad99c9046a24,CUST-8826,USB-C Hub,3,71.72,2024-02-09,Netherlands,bank_transfer,,False
+4b704cba-0c64-4470-b06c-772bf2ff691f,CUST-9691,Ethernet Cable,2,35.21,15/02/2024,Germany,voucher,4.1,False
+ebf96e1d-8cd3-4fb6-9d67-d9ab194095db,CUST-2646,Mechanical Keyboard,2,108.59,2024-11-28,Germany,voucher,27.6,0
+2cfa2285-64ca-44fd-8044-1d22401f6caf,CUST-4366,RAM 16GB,5,131.66,2024-07-15,U.K.,voucher,19.3,0
+d8942c92-01bd-4efb-b030-3f199231c88c,CUST-2163,RAM 16GB,8,£92.17,06/04/2024,Germany,paypal,28.6,False
+f3785d95-851e-4d2a-aaf7-df50872f9c12,CUST-2106,Wireless Headphones,10,258.93,2024-06-11,United Kingdom,debit_card,20.5,False
+85139b8d-66f6-4e4c-993d-0e50db6e4b51,CUST-9791,RAM 16GB,2,284.85,21/01/2024,The Netherlands,debit_card,21.4,0
+501aaaa1-09a4-4682-8c75-8cd264ab1a88,CUST-4909,Wireless Headphones,7,28.30,2024-05-22,France,credit_card,4.7,False
+daa8e43f-3f20-4796-96b2-e9e18dc39668,CUST-3684,SSD 1TB,1,£185.62,2024-08-10,GERMANY,voucher,19.7,False
+252628e3-68c7-4ffe-b251-ba1f7a36fcb7,CUST-8034,Monitor Stand,6,217.62,21/09/2024,U.K.,credit_card,23.4,False
+0d9f5b20-42c6-4bfe-82d5-c737423d1a35,CUST-5179,Cable Organiser,3,£175.10,14/05/2024,France,voucher,10.8,False
+736d2679-7fb5-489b-9584-a2fed1a00e98,CUST-6963,Laptop Stand,8,72.37,11/12/2024,uk,debit_card,,False
+9ebf1c03-926c-4f48-84f9-de04d38c0f34,CUST-7108,USB-C Hub,2,274.60,19/01/2024,FRANCE,credit_card,9.7,0
+804fbc81-4f54-491f-856b-b6567284322d,CUST-8483,Wireless Headphones,2,£157.14,2024-04-01,france,debit_card,26.3,0
+7f26aa0f-a0da-4b6d-aaa5-6d58d8eca88c,CUST-3466,Wireless Headphones,4,94.64,29/05/2024,sweden,credit_card,17.8,False
+6ecafeff-96d8-42f6-9b6c-e125a064e50b,CUST-4361,RAM 16GB,2,192.59,29/04/2024,France,bank_transfer,,0
+5fd849fc-1abd-4250-ad6e-eca80aca348e,CUST-2391,Ethernet Cable,8,291.89,08/09/2024,France,voucher,1.3,0
+b41055c4-be90-4b3c-83ca-38e0cee076a0,CUST-7438,Desk Lamp,6,121.32,09/03/2024,FRANCE,paypal,19.9,0
+44934e5b-f9cc-43e5-a8b0-c0d0100c057d,CUST-8635,Webcam HD,8,73.91,2024-06-11,Deutschland,credit_card,23.1,False
+ea1cf813-2e37-4dce-9136-a1bc120b22c0,CUST-4522,Mouse Pad XL,1,232.24,2024-10-01,sweden,debit_card,25.6,0
+eddf1969-0c15-4816-87c9-1a66fc8cec05,CUST-8408,RAM 16GB,7,290.67,16/02/2024,U.K.,debit_card,,False
+81e1020d-c049-4a3a-a9f6-f7ca7d30019e,CUST-7563,Webcam HD,4,242.14,2024-02-18,Germany,voucher,,False
+84fe0805-7232-4727-ac98-8655deaae89e,CUST-3007,Wireless Headphones,6,£244.75,2024-10-27,united kingdom,credit_card,27.1,False
+61336552-e89f-4204-a81d-a02b1152cb5a,CUST-5505,Monitor Stand,3,132.77,27/03/2024,Deutschland,debit_card,11.5,0
+4e417adc-604d-4380-be55-26a888c67a25,CUST-3248,Laptop Stand,7,187.00,18/01/2024,France,voucher,26.5,False
+e6e4420a-c308-4b7b-b0d4-f8bcb9401189,CUST-9231,Webcam HD,10,241.63,07/05/2024,france,paypal,23.5,0
+ff7032b3-6fdf-4a75-828a-cf0ced6d0955,CUST-4813,Mechanical Keyboard,6,£181.14,2024-04-02,Sweden,debit_card,8.4,0
+90521c28-8847-47ca-b560-ae821579db9b,CUST-3885,Gaming Mouse,3,162.43,2024-12-02,FRANCE,paypal,22.9,0
+22756b31-d1dc-4625-bc04-040666f64cd5,CUST-6063,Mechanical Keyboard,9,179.50,2024-12-23,netherlands,credit_card,17.0,False
+45ca66b6-c511-485a-83c1-aca9260b8261,CUST-6301,Wireless Headphones,3,£182.48,2024-02-16,France,debit_card,10.0,False
+29221f72-e722-4e5a-bf78-9d1606ec8a79,CUST-6514,Monitor Stand,2,46.78,27/10/2024,sweden,debit_card,10.9,1
+6e82280d-7216-4bd5-a3aa-10f307c64ee2,CUST-3872,Laptop Stand,10,133.87,21/03/2024,GERMANY,paypal,9.5,0
+741d2f50-2eec-44d6-8bcb-170a57d58ba8,CUST-6213,Screen Cleaner Kit,10,5.52,2024-03-06,germany,voucher,25.5,False
+c4243a95-2a29-4449-a972-ffaa826e6989,CUST-1186,Monitor Stand,8,46.48,23/02/2024,France,debit_card,29.5,False
+27861c7e-948e-4ec8-a2fe-129a0258d44b,CUST-9078,Screen Cleaner Kit,7,80.70,2024-12-20,Deutschland,paypal,,0
+36545202-d64a-428d-a4f8-528611991aa7,CUST-5831,Wireless Headphones,1,249.49,2024-10-06,United Kingdom,paypal,22.7,0
+d544d034-ca17-4ea8-9acc-f8bfd4d2c4f4,CUST-8909,Desk Lamp,10,55.17,2024-02-23,France,bank_transfer,16.4,False
+7fa5e490-d657-4a48-b47f-8905e2f71c79,CUST-4891,USB-C Hub,5,267.47,2024-11-30,France,bank_transfer,6.2,0
+b419e14b-adbd-46d4-a57e-294abf930dd9,CUST-1421,Gaming Mouse,2,£149.82,19/10/2024,germany,paypal,,0
+30b2e2bb-d742-4247-98fb-d8e04346492e,CUST-7249,Webcam HD,6,39.07,2024-02-11,germany,bank_transfer,26.8,0
+545f9b0f-8e1d-4435-b865-36f0ab28484f,CUST-9871,Laptop Stand,6,142.18,2024-01-23,U.K.,debit_card,1.8,False
+eca8ca63-8aef-43f5-a982-c1785da49af6,CUST-2293,Laptop Stand,5,119.19,2024-10-10,The Netherlands,credit_card,20.6,False
+78cd0dca-da51-46cd-a756-c6852abc9c01,CUST-4471,Cable Organiser,3,157.45,14/09/2024,germany,debit_card,4.4,0
+280c170f-8378-485e-82ef-74fa7ecf1acb,CUST-2425,Laptop Stand,2,296.53,2024-01-22,FRANCE,bank_transfer,18.8,0
+0dab513f-7fca-41cb-b83a-e1dfc67164c3,CUST-3451,Mechanical Keyboard,7,86.47,2024-10-09,U.K.,voucher,23.6,0
+5880389e-2470-4693-b88d-4cf511e6dbea,CUST-7275,HDMI Adapter,5,282.19,25/10/2024,netherlands,voucher,3.0,0
+550c72bc-1495-45c0-ba39-ecf1ad81a131,CUST-1807,Desk Lamp,4,55.79,2024-11-07,france,paypal,20.4,0
+c1744c2a-8a60-4ba4-81b1-aa94f31793c5,CUST-5923,Desk Lamp,3,246.12,2024-07-09,Deutschland,paypal,14.7,False
+f453e5ed-73c0-449b-bb0d-ba6f3a6c9530,CUST-1920,RAM 16GB,6,£183.46,17/05/2024,Sweden,credit_card,27.4,0
+146e1b87-3eb2-4960-9c4d-24658771012f,CUST-1541,SSD 1TB,4,123.99,08/06/2024,UK,paypal,17.1,False
+a11f237b-6347-428c-99b9-01f47d513abf,CUST-8308,Mechanical Keyboard,8,113.65,2024-12-26,france,voucher,27.7,False
+b7c19735-3b54-4ea9-b1dc-706b3d690ca5,CUST-4511,Mouse Pad XL,3,53.23,2024-10-09,uk,debit_card,20.7,0
+fd9c5706-7852-4f37-b679-742df6658c28,CUST-1138,Gaming Mouse,3,197.21,2024-12-12,GERMANY,voucher,29.0,0
+64c93b69-7c5e-474f-8443-03317e381efc,CUST-9530,Mouse Pad XL,5,214.25,05/06/2024,The Netherlands,bank_transfer,25.5,False
+4a46be11-c443-4fc5-a93f-5617f19e2849,CUST-8892,USB-C Hub,2,155.89,2024-10-26,france,paypal,11.2,0
+e13ec7ac-a5b9-4693-a282-e22a665b7d6d,CUST-7620,HDMI Adapter,10,86.67,2024-11-23,United Kingdom,debit_card,19.5,False
+fdac178a-b46c-4e38-92f7-49b5602ed3f7,CUST-9759,HDMI Adapter,4,299.24,14/01/2024,france,paypal,11.6,True
+8d65c388-ff4b-474a-ad4f-559a30e6a8a8,CUST-6499,HDMI Adapter,3,55.14,2024-09-16,Sweden,debit_card,8.8,0
+d1ba836e-944f-4b11-84c6-6b2c9789f182,CUST-1879,Mouse Pad XL,8,262.06,2024-06-30,U.K.,voucher,11.2,0
+4670498c-69fc-4126-b2fa-96e502e787bb,CUST-4281,Webcam HD,3,267.37,2024-11-13,Deutschland,voucher,11.5,False
+c2aa2512-05d1-44eb-872f-41c94885c951,CUST-8406,Monitor Stand,1,259.40,2024-08-22,uk,debit_card,10.0,0
+b541cbdf-fe00-42d0-8187-c87965243926,CUST-7280,Wireless Headphones,8,149.42,22/10/2024,Netherlands,voucher,18.4,0
+7342d7ee-6b17-4241-b626-a672d1acd465,CUST-6641,Monitor Stand,4,285.26,12/04/2024,germany,credit_card,15.9,True
+79174c37-4fb1-4262-b78f-fc2528e9d56b,CUST-9587,Webcam HD,10,£95.29,15/07/2024,sweden,debit_card,,0
+e21949af-0000-4a0f-afb0-9f61e530e279,CUST-3149,Gaming Mouse,4,149.59,24/06/2024,Germany,voucher,27.2,False
+be44efac-e8b1-4d90-bfc6-e398c75475e7,CUST-1796,Ethernet Cable,10,113.13,2024-09-15,Sweden,credit_card,,0
+5e6526f3-571d-45f7-9a80-9332bff7c896,CUST-5933,Laptop Stand,1,19.22,30/11/2024,Germany,voucher,3.7,False
+63c8ef51-ef27-4804-bcd4-dbb5e7b73e77,CUST-9154,Gaming Mouse,2,211.70,18/05/2024,U.K.,debit_card,15.3,0
+32f1050d-b2cc-43ab-95e4-d5a99138faa4,CUST-4842,Wireless Headphones,6,292.06,14/05/2024,Netherlands,credit_card,4.8,False
+6533a931-4179-421e-a4c8-441464cd65d2,CUST-8483,Monitor Stand,4,202.35,26/02/2024,france,bank_transfer,15.4,False
+9c94fcc4-7c97-4948-8a51-15c3db4ad3cf,CUST-1158,Mouse Pad XL,1,£56.53,2024-01-26,uk,debit_card,24.0,False
+52161ea2-be3e-4904-b54a-41bf5cd3864a,CUST-7557,SSD 1TB,7,134.12,2024-06-17,United Kingdom,bank_transfer,2.8,False
+9edeb134-72df-49df-aee9-5b849712d529,CUST-7816,Screen Cleaner Kit,2,240.96,19/12/2024,Deutschland,voucher,3.4,False
+a77ad3a7-2d8b-4364-b1c3-dc80ff90470a,CUST-2850,Screen Cleaner Kit,8,185.33,2024-12-13,netherlands,bank_transfer,25.9,False
+40c946c6-c7f3-4c18-a440-c91b3de52216,CUST-9570,Desk Lamp,9,£198.21,2024-01-24,FRANCE,voucher,15.7,False
+ecb0784f-ffb7-4ce2-96c5-b66ebe239beb,CUST-9283,Mouse Pad XL,3,219.35,2024-02-18,united kingdom,bank_transfer,19.2,False
+43c5b124-f5aa-435b-9db5-985810cbe318,CUST-2291,SSD 1TB,4,150.03,2024-03-25,netherlands,voucher,1.5,0
+99dda38e-e231-4aea-ad27-d0c91e695339,CUST-9996,Wireless Headphones,1,152.03,2024-08-17,Netherlands,voucher,22.4,1
+6632e53c-3c29-468b-8122-659751bbe584,CUST-6439,RAM 16GB,8,267.57,12/11/2024,Deutschland,paypal,13.7,False
+22eebc9e-b4ee-4c41-b2e1-220f4a3dd9ec,CUST-7125,Desk Lamp,9,228.99,2024-08-19,Sweden,credit_card,24.9,0
+ad33ee3e-7fc4-464d-a542-16920517ac15,CUST-8488,Mouse Pad XL,4,247.43,2024-03-25,Netherlands,paypal,7.6,False
+9bb3eec1-aab1-46e9-bacb-636054f298e8,CUST-3205,SSD 1TB,9,18.71,25/02/2024,Sweden,voucher,3.7,0
+f7e27dca-29bc-4dfc-b824-de72aa4da3a8,CUST-7347,HDMI Adapter,2,132.67,25/01/2024,GERMANY,voucher,23.4,False
+9fdf5f3d-8649-44b9-80b0-8a1778ab278d,CUST-3263,Laptop Stand,3,184.64,2024-07-15,The Netherlands,voucher,11.9,0
+7d51c2a3-c3a0-4172-b1f9-088c47be096a,CUST-6657,Screen Cleaner Kit,5,166.59,02/06/2024,SWEDEN,debit_card,16.6,False
+da06c99e-b37f-4195-b504-edfebdae15f3,CUST-7839,HDMI Adapter,8,287.70,29/12/2024,SWEDEN,voucher,9.7,0
+6d315af1-3c5d-4e54-a04c-f39af6906881,CUST-3636,Monitor Stand,5,£129.59,26/05/2024,GERMANY,debit_card,11.4,True
+2d23fe34-444c-46f4-8c58-8076d6be65d3,CUST-4675,Desk Lamp,9,92.06,01/02/2024,SWEDEN,voucher,,False
+e7bf5c0c-86c4-40e9-8417-346daf09236f,CUST-1881,Wireless Headphones,6,236.36,2024-07-18,The Netherlands,paypal,19.9,0
+3d1cc1a4-32ac-4b44-8a8f-91c6b0536b83,CUST-4218,Cable Organiser,9,235.36,13/04/2024,SWEDEN,debit_card,27.3,0
+bb7df356-be63-4e43-8476-33d487cd12eb,CUST-5329,Mechanical Keyboard,5,£295.11,2024-05-30,Netherlands,voucher,22.1,False
+a8eb5694-0eea-4db9-beb0-01c8faf6cb32,CUST-9037,Cable Organiser,5,142.56,2024-05-10,SWEDEN,voucher,,False
+53b8db4f-df64-4ab5-b97b-cd519ac5f7c6,CUST-9798,Laptop Stand,9,213.76,2024-07-02,Netherlands,paypal,15.6,False
+c18ef864-89bc-4be5-afbb-391cde840e6b,CUST-2879,HDMI Adapter,1,200.67,23/04/2024,sweden,bank_transfer,28.5,0
+e8a167f5-ab56-48b6-a9e1-39f692d14e66,CUST-9851,Desk Lamp,5,186.03,03/05/2024,netherlands,credit_card,20.5,False
+abbe842b-574b-4bbe-8db5-32f5a9b901cd,CUST-2349,USB-C Hub,9,115.60,21/09/2024,France,voucher,1.3,False
+5075c07b-40e5-422c-b768-87cc7368471a,CUST-8130,HDMI Adapter,9,24.30,2024-09-30,Germany,debit_card,25.9,False
+e2b1a201-ce67-4c74-997a-a8c74c761318,CUST-7357,SSD 1TB,7,£102.85,2024-01-13,FRANCE,bank_transfer,23.8,False
+d0fb2e12-157d-48f3-9e33-7ae44d362f10,CUST-2189,Webcam HD,1,119.89,2024-08-09,SWEDEN,credit_card,,False
+dc509c1b-078c-4363-8f05-10c7ed716314,CUST-9740,Gaming Mouse,3,£93.89,28/05/2024,Netherlands,bank_transfer,13.1,False
+a3c13ef8-856c-4918-b4f0-d287f791e4ba,CUST-3316,USB-C Hub,9,192.03,2024-10-06,UK,credit_card,29.0,0
+f1d15911-460e-4a3c-8d70-4f1a4b558803,CUST-9397,Mechanical Keyboard,7,163.45,20/10/2024,germany,debit_card,22.4,0
+e9916acd-569b-46e7-9467-07220b6de067,CUST-5762,HDMI Adapter,2,79.55,23/04/2024,Sweden,paypal,17.0,1
+88fa5a27-fc9e-415c-a352-1d6fa59647bc,CUST-4170,Webcam HD,2,176.27,2024-02-20,sweden,bank_transfer,20.1,0
+978f340f-d729-4800-8db1-53f287621c39,CUST-6131,Gaming Mouse,1,95.16,17/06/2024,germany,bank_transfer,10.9,0
+746ebf70-8267-4571-a536-91c5c19869d2,CUST-2783,Mechanical Keyboard,9,44.61,21/05/2024,The Netherlands,voucher,13.9,0
+9752a202-c60a-45ed-be02-b1ace5ef46de,CUST-9309,HDMI Adapter,1,258.31,11/02/2024,UK,voucher,7.9,False
+ff0d5eb4-4e00-4bbe-a367-aa26605bc364,CUST-7430,Gaming Mouse,6,179.05,2024-10-23,GERMANY,debit_card,16.3,0
+135abd5c-f249-4a3e-90d9-31b6e4941f6e,CUST-8310,Mechanical Keyboard,3,31.70,25/08/2024,Sweden,voucher,,False
+e2ae0c2d-2ef6-40cd-83fd-0bcc37938d69,CUST-5331,Webcam HD,2,290.47,16/10/2024,germany,credit_card,10.8,0
+5a491a52-86d5-4520-a154-5b5bce908d9a,CUST-5480,Mouse Pad XL,9,272.77,2024-12-08,United Kingdom,voucher,13.6,1
+3e28839f-fef1-4932-a0bb-c798019d2e02,CUST-9460,Laptop Stand,4,116.10,05/10/2024,netherlands,paypal,26.9,1
+68d5209d-3632-4d60-96fe-57b2f9b2a9ac,CUST-4062,Mechanical Keyboard,3,£266.71,06/09/2024,GERMANY,voucher,13.2,0
+02bdf2ef-7b40-4a67-8305-eee126f84a5f,CUST-4992,Wireless Headphones,1,127.30,01/03/2024,Netherlands,voucher,20.3,False
+6ed7d779-ab62-4ebe-a3bf-e65e82952b80,CUST-1305,Screen Cleaner Kit,7,£190.70,2024-10-30,SWEDEN,paypal,1.7,False
+bb06565e-8e00-4713-803c-82295e6fdc71,CUST-9369,Monitor Stand,3,183.92,2024-02-13,Sweden,paypal,6.6,False
+122c75ff-e774-41e3-a0bc-74013cbbf31b,CUST-2577,Mechanical Keyboard,10,25.30,20/08/2024,Deutschland,voucher,0.5,0
+b2b2afef-7c3e-4e8b-b49d-b4b85259c7c8,CUST-7892,Webcam HD,9,236.23,2024-11-03,Netherlands,voucher,14.5,False
+dc5cfc39-bbc8-4335-b2c5-bcbc1afb5f5c,CUST-5170,SSD 1TB,3,241.67,2024-08-07,Netherlands,credit_card,17.7,False
+7ca57d61-f59d-40d8-bf2f-ce67d3626e37,CUST-2930,RAM 16GB,9,165.39,25/05/2024,Sweden,bank_transfer,,False
+297484aa-49e3-42b1-bdc5-fa3dbaf44519,CUST-6990,Ethernet Cable,7,242.25,2024-12-01,sweden,bank_transfer,12.8,0
+638e7a6b-cc29-4f17-81e3-4872b5a2b416,CUST-7522,Desk Lamp,6,236.21,2024-04-14,Sweden,credit_card,16.6,0
+680eb1a1-406a-453f-8bb8-2557fc3e2ae4,CUST-1086,Cable Organiser,7,211.29,2024-04-27,Germany,debit_card,12.0,False
+96233bff-a3be-48c5-9d70-c5b05a0d41f3,CUST-9536,Monitor Stand,10,£133.43,29/08/2024,The Netherlands,voucher,2.4,1
+914103ce-eb5f-44d6-b904-ccd869db2bbf,CUST-9364,RAM 16GB,1,246.96,30/01/2024,germany,voucher,6.1,0
+9055c725-dff3-48eb-b90c-1de9ce03923b,CUST-7642,Ethernet Cable,7,111.11,27/03/2024,France,voucher,2.6,0
+32f9f17b-dd5c-4e5a-9b52-16e4dd35136c,CUST-4707,Ethernet Cable,5,£25.23,08/01/2024,France,bank_transfer,24.9,0
+eb11eed7-a022-40a1-99f7-6ea83304c8d0,CUST-9813,Mouse Pad XL,5,82.02,25/07/2024,SWEDEN,paypal,2.2,False
+ab43c7d5-c0aa-4f78-aeba-2c4abf10ca24,CUST-8896,USB-C Hub,1,116.23,2024-12-21,sweden,credit_card,10.2,0
+c0bf965d-c0d7-4385-92b1-46126cc71ea7,CUST-5706,USB-C Hub,4,298.28,14/07/2024,france,paypal,9.5,False
+a59687f8-b2f6-4d44-aaf8-b33da27375b4,CUST-4847,Desk Lamp,4,57.64,08/02/2024,Netherlands,paypal,17.2,False
+9143e33d-9af4-472b-be27-d195f3c3c3e8,CUST-1108,Cable Organiser,10,251.30,2024-04-15,The Netherlands,credit_card,23.4,False
+a7552c2d-4ab5-46b4-9172-e43ff2ae032e,CUST-7518,Gaming Mouse,5,98.04,2024-09-03,SWEDEN,debit_card,17.2,False
+36bbb6c1-4736-4969-a49a-1f5762c8ea2f,CUST-9490,SSD 1TB,2,129.83,28/01/2024,netherlands,credit_card,,False
+44dbdfeb-47aa-4bce-b74c-2bc5fb527129,CUST-8722,Ethernet Cable,5,116.92,07/01/2024,GERMANY,paypal,25.9,0
+99622233-2675-4e97-aca9-20ed6d11fc90,CUST-4744,Mouse Pad XL,3,67.10,2024-04-04,Sweden,paypal,25.6,False
+16727b43-f956-4b33-b9da-a08c0c615e19,CUST-9185,Mechanical Keyboard,7,257.60,30/04/2024,GERMANY,bank_transfer,22.2,False
+b2b6c732-d00f-4e48-896f-870b9e5a96d2,CUST-8370,Desk Lamp,2,£258.25,2024-06-02,netherlands,paypal,4.9,0
+e054478d-9d91-4a65-bdd7-a22a6477354b,CUST-9821,Mechanical Keyboard,10,169.45,2024-07-03,sweden,paypal,12.4,False
+5f310221-3733-49d8-9400-65b9f27939e4,CUST-7911,HDMI Adapter,6,148.80,15/06/2024,Deutschland,credit_card,11.4,False
+ad4fe811-f6d8-4b14-8f39-9d101104ff44,CUST-9535,SSD 1TB,6,72.31,2024-02-10,netherlands,debit_card,8.0,0
+001d512c-e526-4617-b392-fb21ed964c1f,CUST-2687,USB-C Hub,7,41.88,04/04/2024,Germany,bank_transfer,22.3,False
+ee3601ce-57e8-4842-ab96-b7a805f76508,CUST-4757,Gaming Mouse,5,232.42,2024-10-07,The Netherlands,paypal,3.1,False
+7b6451e5-471e-457e-81aa-429a92f8f1e0,CUST-9856,Screen Cleaner Kit,8,43.72,14/08/2024,netherlands,voucher,,0
+36096816-a79a-402c-bfc7-dd7f9d6c76d2,CUST-6073,Screen Cleaner Kit,9,284.79,2024-08-15,sweden,bank_transfer,13.7,0
+3d516912-cf0b-4aae-8788-828fb9827cd4,CUST-8687,RAM 16GB,5,31.41,2024-10-03,France,bank_transfer,4.7,True
+8946113f-62c9-48cb-9309-52cbcb0389bf,CUST-8161,Laptop Stand,9,230.92,2024-09-01,Netherlands,debit_card,23.9,False
+bbf83989-df4b-4f0d-b372-4bf750b926de,CUST-5404,Laptop Stand,9,116.61,2024-11-26,France,credit_card,7.2,0
+7faa770e-6589-40a9-8956-eac5734a43c9,CUST-1813,RAM 16GB,3,37.55,2024-04-03,UK,debit_card,21.0,0
+14cdf259-ce34-4333-9186-50ab1ec5adab,CUST-6601,Laptop Stand,4,41.88,2024-02-22,netherlands,bank_transfer,,False
+beaaf305-9fbf-42e9-aa8c-cdf98130872e,CUST-8702,Mechanical Keyboard,9,238.46,2024-07-09,uk,paypal,28.5,1
+3c18a764-2c65-4bac-b271-9e233b0e41c6,CUST-2539,RAM 16GB,8,40.97,14/07/2024,germany,bank_transfer,23.1,False
+acbe6fce-d98d-459f-9770-3b7ca92f6f0e,CUST-5895,Gaming Mouse,8,97.06,18/07/2024,france,credit_card,1.3,False
+019d11e6-648f-4ad3-a5c9-1937d2128c29,CUST-1146,Wireless Headphones,4,38.30,2024-12-07,The Netherlands,bank_transfer,5.0,False
+50e2a003-7cac-4373-a77f-49ed430b4075,CUST-3521,Desk Lamp,6,£114.55,18/12/2024,U.K.,credit_card,2.7,False
+c1d2bb93-ad46-42dd-8bee-5bafd7db0a44,CUST-6868,Desk Lamp,7,98.43,2024-03-05,uk,paypal,10.4,False
+be16490e-e861-40b6-9c27-69d4c3a82325,CUST-5510,Mouse Pad XL,8,134.05,2024-01-21,FRANCE,voucher,5.7,0
+99665fd4-6b53-4b08-9601-094feee5661d,CUST-6965,Cable Organiser,1,50.72,2024-03-23,germany,paypal,11.0,1
+43ab1c18-bd8e-4dae-a77d-3cac1547c2dc,CUST-6276,USB-C Hub,7,163.98,02/02/2024,France,voucher,14.9,0
+beaf7732-572a-4adf-91a4-8254630da8f0,CUST-7366,HDMI Adapter,10,251.37,2024-12-03,united kingdom,voucher,6.1,False
+b1e2b71b-b172-4a8c-ac73-353701c2b5d7,CUST-8668,Cable Organiser,2,80.49,15/11/2024,The Netherlands,credit_card,2.1,False
+acf1b7f8-e7a4-44bd-b25e-cbd09e465ade,CUST-2153,Mouse Pad XL,1,281.77,03/07/2024,sweden,credit_card,21.3,0
+c3bc4ce3-a06e-410b-a5e0-e238a72dfcd3,CUST-7802,Desk Lamp,3,33.64,20/04/2024,Sweden,voucher,5.7,False
+eca8ca63-8aef-43f5-a982-c1785da49af6,CUST-8258,Screen Cleaner Kit,9,212.24,02/07/2024,GERMANY,paypal,23.8,0
+48b31108-f631-48ad-bd5b-dd626330a9e8,CUST-4504,Laptop Stand,9,100.76,08/10/2024,SWEDEN,paypal,12.9,False
+c7b50a37-24ca-4b72-b7a6-18852d0fe969,CUST-5920,Gaming Mouse,1,137.00,03/07/2024,France,paypal,29.5,False
+2aba91fb-c4f3-446d-a501-e3dc53255b64,CUST-8542,Webcam HD,1,283.28,12/01/2024,uk,debit_card,15.3,False
+0d9f5b20-42c6-4bfe-82d5-c737423d1a35,CUST-8905,Mechanical Keyboard,6,176.73,2024-05-15,united kingdom,voucher,2.8,False
+44c47954-2386-4987-b2b3-be5a62d47ede,CUST-7824,Screen Cleaner Kit,7,93.61,18/02/2024,France,debit_card,2.4,1
+7863b6ef-cfa4-4dc1-9b5c-7c0f1dbf3729,CUST-3450,Webcam HD,10,278.94,30/11/2024,SWEDEN,debit_card,1.6,0
+21c10cd9-d958-4e0f-9ac5-b974fd4f7b56,CUST-7460,Mechanical Keyboard,5,220.81,2024-03-19,Netherlands,paypal,17.9,False
+dc3444bc-379e-449e-9b30-d1d5613324e4,CUST-4245,SSD 1TB,8,224.86,2024-02-12,Deutschland,voucher,12.0,False
+523e5bcb-bb4f-436d-983d-3f55afce62b1,CUST-7939,Webcam HD,7,299.13,10/04/2024,United Kingdom,debit_card,8.0,False
+2a37ea55-509e-4445-a392-2c0b039ffe27,CUST-8216,Wireless Headphones,3,198.34,2024-06-13,Sweden,debit_card,10.5,0
+78539965-316b-4253-a3a6-76fb6ce6b8b3,CUST-6624,Desk Lamp,1,228.52,2024-12-16,France,paypal,1.6,False
+0ab5df5c-053f-4e61-aa16-037cbcc23ade,CUST-1301,Laptop Stand,3,102.89,2024-08-18,SWEDEN,voucher,16.4,0
+776e5331-5de8-4116-9d17-37c009608406,CUST-5445,HDMI Adapter,7,22.72,2024-01-23,United Kingdom,credit_card,8.1,False
+6b338d11-c08f-4f31-af39-4002538e3752,CUST-9709,USB-C Hub,10,265.59,2024-01-10,Netherlands,debit_card,15.3,0
+623b5394-d2a7-46a6-b2ab-f88653438fa7,CUST-7445,Desk Lamp,8,170.39,13/09/2024,France,credit_card,,0
+7f18d4b6-34dc-48e9-bfe1-1c4ee209993f,CUST-1482,RAM 16GB,7,109.83,26/06/2024,france,debit_card,29.4,False
+a225382e-e1f2-4a31-8074-7d98df1c2f73,CUST-3502,Laptop Stand,4,120.88,2024-03-18,netherlands,voucher,15.6,False
+a86e84e7-2974-4682-a0c9-8539bdc7cb1d,CUST-3215,Laptop Stand,9,43.86,2024-06-17,France,voucher,20.5,False
+d4cadef1-9de5-443f-bdff-7dd6ccd1e4d3,CUST-7737,Monitor Stand,7,169.41,2024-03-21,france,paypal,9.5,False
+13926c0c-f7f9-4275-8a04-b2501c66791a,CUST-4783,HDMI Adapter,4,36.49,18/03/2024,Sweden,paypal,18.4,False
+f10c0343-796c-42b7-a0a8-d415dd2c69ac,CUST-3253,Mechanical Keyboard,8,145.59,10/02/2024,Netherlands,debit_card,21.4,0
+049980e0-22f5-4892-b7fb-f29ff2bef740,CUST-3901,Screen Cleaner Kit,2,290.79,2024-01-17,Deutschland,voucher,6.7,False
+3a0f2024-76c0-4b9a-a146-4d75de3ff163,CUST-9784,RAM 16GB,7,260.69,07/09/2024,FRANCE,credit_card,23.3,0
+c315e675-3cf2-470a-b118-ba48b4cf57d6,CUST-9456,Cable Organiser,7,139.78,2024-09-23,SWEDEN,credit_card,7.4,False
+1833eb5f-c195-4285-8185-7f25ba3401b4,CUST-8595,Mouse Pad XL,3,122.41,2024-04-07,SWEDEN,bank_transfer,13.8,False
+6bb648f5-ee68-415c-823c-70f363a3dd4d,CUST-1408,Mechanical Keyboard,8,38.38,16/02/2024,france,voucher,20.9,0
+fd4efb69-4c52-433f-b2ee-f8a6878b7c06,CUST-2870,Desk Lamp,2,£265.34,30/12/2024,united kingdom,paypal,19.5,False
+5a6b043f-0d35-4a73-9e58-deea5155606b,CUST-6491,Ethernet Cable,3,118.30,13/02/2024,uk,debit_card,28.5,0
+5c8eb4da-aac4-4250-8057-02b9a145c515,CUST-4323,Wireless Headphones,3,215.04,2024-03-15,U.K.,paypal,23.1,False
+824a5a65-a7a1-4e1d-96d2-358575db8063,CUST-8794,SSD 1TB,10,257.34,2024-01-07,Deutschland,bank_transfer,,False
+ec393577-ae07-4684-b836-f8fc281a8534,CUST-3429,Wireless Headphones,3,6.93,10/02/2024,United Kingdom,credit_card,18.9,False
+0ca8175c-eec3-48f4-a438-93adbeb3bda5,CUST-5659,Ethernet Cable,3,201.75,15/03/2024,germany,bank_transfer,27.6,1
+03535947-2c07-4b63-beb2-848e0d101fb0,CUST-5797,SSD 1TB,2,15.56,2024-10-23,Sweden,credit_card,26.9,0
+902809ab-94a4-42b1-82a7-db0a6e5c50a4,CUST-5705,Laptop Stand,10,102.11,21/12/2024,The Netherlands,paypal,6.3,True
+4187ab4e-38ed-409e-965f-01313ec7daf8,CUST-4812,Desk Lamp,3,298.52,12/05/2024,netherlands,debit_card,16.9,0
+51e50a12-3e42-44d5-919a-cc8ff70bd093,CUST-6468,Webcam HD,1,142.13,2024-01-01,The Netherlands,debit_card,6.2,0
+116a684e-3d31-4d7b-9752-e81136484b4c,CUST-6592,Laptop Stand,6,208.55,06/01/2024,U.K.,voucher,9.0,False
+14486173-fb2a-480e-8fea-d41885c9c9aa,CUST-3545,HDMI Adapter,8,62.22,15/01/2024,Deutschland,voucher,14.4,False
+777d7ffe-0df3-4b54-8f6e-90b02d564d8c,CUST-1306,Gaming Mouse,9,245.17,2024-06-20,SWEDEN,paypal,15.6,0
+498ae015-dcb5-46a8-a087-936588836f80,CUST-7382,Mechanical Keyboard,10,49.03,2024-06-30,SWEDEN,credit_card,11.3,False
+15c44a32-431f-47c1-803c-9c3f09ef7eb1,CUST-9603,Monitor Stand,4,£97.77,06/06/2024,France,credit_card,14.9,0
+c65c5e4e-84be-405c-9fba-699e4b793dc2,CUST-8921,Desk Lamp,6,234.44,10/07/2024,GERMANY,paypal,0.7,False
+c23f76d7-6816-468f-98d6-6fc9e7e9a34f,CUST-9558,USB-C Hub,7,33.97,14/03/2024,Netherlands,paypal,29.8,False
+a90838c5-0c0a-4103-a490-a8b7474fd57f,CUST-6114,HDMI Adapter,10,£180.30,23/01/2024,uk,paypal,1.4,0
+1b9e44fe-2561-44ff-9d69-2f274ee6f043,CUST-9422,USB-C Hub,1,86.60,2024-04-12,uk,voucher,3.5,0
+4a4cc10f-953d-4b0a-aab8-c98e854d12d1,CUST-9856,SSD 1TB,6,84.95,28/06/2024,Sweden,debit_card,17.2,0
+9481c8c2-a42c-4b23-ad6e-a54ef408c2ed,CUST-6119,Webcam HD,6,204.26,2024-01-15,Sweden,voucher,12.8,0
+09ad073e-ce3f-4987-8673-da1f7d49fe1e,CUST-6085,HDMI Adapter,8,227.93,10/02/2024,united kingdom,bank_transfer,24.4,0
+b1435ba0-5ec4-4927-9935-8ca008571581,CUST-8987,Wireless Headphones,8,47.39,28/04/2024,France,bank_transfer,10.9,0
+56c95675-ed61-465f-b418-06008d93d015,CUST-6339,RAM 16GB,2,141.06,2024-02-27,The Netherlands,credit_card,18.1,False
+b34ecd52-3997-4ebe-867f-1652c9795ee7,CUST-4411,Mouse Pad XL,6,123.23,03/06/2024,U.K.,bank_transfer,16.4,0
+4cf7d0ef-8d88-4f0c-8192-6e7a79755268,CUST-8584,Webcam HD,10,105.94,10/08/2024,U.K.,credit_card,20.1,0
+d26c8aba-39a5-416e-90c6-09f52c1d3d70,CUST-2007,USB-C Hub,8,£286.98,2024-08-15,France,debit_card,24.4,0
+01752c49-f970-4355-9550-c734958d557f,CUST-8326,Gaming Mouse,10,£192.65,24/10/2024,Sweden,paypal,4.5,0
+8439a265-d584-4487-87c5-5ee81782a03f,CUST-1133,Ethernet Cable,10,274.39,02/06/2024,U.K.,bank_transfer,13.0,0
+4d576732-e976-48dd-9e38-ac6af4899d24,CUST-1510,Gaming Mouse,5,23.40,06/03/2024,united kingdom,voucher,0.0,0
+a9845324-3fc7-4314-9423-50c87cfdcbeb,CUST-7301,Mouse Pad XL,9,214.96,20/07/2024,GERMANY,bank_transfer,6.3,False
+733c9293-70e8-49cf-9329-dd4e9b55306a,CUST-3224,USB-C Hub,7,262.45,2024-03-19,Netherlands,bank_transfer,,False
+628d9157-4225-4bf7-9661-e451ba239bec,CUST-4698,Mechanical Keyboard,6,210.13,21/08/2024,netherlands,voucher,13.6,0
+dc4563ac-6e52-4fdc-81a1-14ddee136530,CUST-8917,Desk Lamp,1,254.80,04/01/2024,United Kingdom,credit_card,12.3,0
+a6e4e725-2bb6-42fd-92db-49beb36d67cd,CUST-2281,RAM 16GB,9,208.69,2024-10-24,The Netherlands,credit_card,29.5,0
+b413ee30-a3ea-431f-a7cc-ebf2bf5da4ee,CUST-6628,RAM 16GB,1,223.79,2024-05-05,Sweden,bank_transfer,19.0,0
+206f3475-7fde-4c6e-b8b4-8d2c88e26bfd,CUST-5981,Desk Lamp,1,143.41,20/08/2024,GERMANY,credit_card,28.8,0
+19748c6f-5b5c-4d20-88e7-c835ae096fcc,CUST-3077,RAM 16GB,2,£54.87,2024-11-18,Netherlands,paypal,24.3,0
+ac57095f-8ee7-4489-bcce-7b465c61df78,CUST-8317,Webcam HD,3,87.88,2024-05-09,Sweden,paypal,,False
+8ab216f8-7dba-4558-ae29-f4c4de34c269,CUST-9125,Cable Organiser,3,58.33,2024-12-24,sweden,bank_transfer,,False
+6c4b4279-e306-4060-b737-a73dc734b90c,CUST-3745,SSD 1TB,1,219.16,01/05/2024,united kingdom,bank_transfer,25.3,1
+bfa84882-630c-4d7c-87d1-02e708b89c26,CUST-8122,Wireless Headphones,9,284.72,2024-06-03,GERMANY,bank_transfer,20.5,0
+baeb5072-2d55-4331-9bb3-aedb01453637,CUST-5466,Webcam HD,10,288.71,14/07/2024,netherlands,paypal,,0
+811ffe35-bad9-4733-b80f-4141b51c1e93,CUST-3947,Webcam HD,6,177.32,2024-02-20,SWEDEN,credit_card,7.3,False
+cf65439d-71e2-4cbc-8593-ca03b662fe4b,CUST-1557,Wireless Headphones,4,25.04,2024-12-10,FRANCE,credit_card,20.6,0
+aa83ff86-e74b-49d2-84fc-1527019a8003,CUST-3128,Laptop Stand,10,198.69,30/01/2024,U.K.,debit_card,19.1,False
+b8986ab9-1d18-46b4-80a4-91f47c1c737d,CUST-5216,Mechanical Keyboard,6,79.72,26/02/2024,Netherlands,paypal,19.2,0
+8beda30a-8d91-4f4b-ba93-454d49a72497,CUST-7432,Mechanical Keyboard,10,£103.12,2024-02-01,Deutschland,credit_card,7.9,0
+1f91dc3f-60c7-43ad-91e1-4cbb6d69a427,CUST-5105,Cable Organiser,2,132.21,14/03/2024,united kingdom,credit_card,13.2,False
+cd591d28-9c46-4730-9f35-1a92266d3bbd,CUST-9444,Desk Lamp,1,193.89,2024-09-11,sweden,bank_transfer,8.0,0
+6ccd60eb-7b42-49a3-8ce0-ee721287aa13,CUST-9770,Screen Cleaner Kit,10,219.68,2024-08-11,United Kingdom,paypal,6.8,0
+74661cab-0129-4bca-9dbd-2d055ef6aff6,CUST-5750,HDMI Adapter,8,21.27,2024-12-15,uk,debit_card,11.0,0
+6f736a0f-1df3-4ac8-a73c-4c9eaa191575,CUST-8175,Desk Lamp,2,118.32,2024-10-10,Netherlands,debit_card,26.9,0
+8ca19fe4-6cc6-46a6-ab98-106c1dc55b20,CUST-8361,Wireless Headphones,9,217.31,2024-01-19,Netherlands,paypal,1.9,0
+a6021edc-8948-4ca8-8449-5467b9208f19,CUST-2180,Wireless Headphones,4,217.69,2024-01-29,SWEDEN,debit_card,19.6,False
+f824fa50-67c0-4515-bf02-78b97b085b60,CUST-1818,Screen Cleaner Kit,3,144.00,07/09/2024,United Kingdom,credit_card,,False
+daffde8e-1197-4a86-aedb-56a58db43cc1,CUST-7983,Webcam HD,4,£251.42,21/08/2024,united kingdom,paypal,3.4,False
+7c21db55-da1d-4f61-814c-02b219b8a9ce,CUST-2978,Monitor Stand,2,174.90,02/03/2024,France,bank_transfer,23.8,False
+576af2af-ef48-4d1e-a807-cd2568310772,CUST-8978,USB-C Hub,1,168.25,27/03/2024,Germany,credit_card,1.2,0
+cfcd1449-5532-4f6c-840d-9ae24e6ca872,CUST-3344,HDMI Adapter,4,213.48,01/04/2024,GERMANY,voucher,20.8,0
+8de17b63-3ed4-4a6d-abab-7df3b1a0d577,CUST-5934,Webcam HD,2,281.73,2024-08-18,sweden,credit_card,,0
+a1e96faa-bcff-4e6f-9eb1-30a63e5fdfaa,CUST-5528,Wireless Headphones,4,39.65,2024-10-12,Netherlands,credit_card,10.9,False
+60a64e54-009c-41e5-b724-440248a4ec48,CUST-8121,Monitor Stand,4,290.72,17/03/2024,france,voucher,20.1,1
+c6827f7b-3312-4afd-be97-76b7c9429d55,CUST-8287,Ethernet Cable,4,223.41,2024-08-20,U.K.,paypal,23.6,False
+0bb6fd16-37fc-4750-a9b6-03d28de5a4b4,CUST-4615,USB-C Hub,7,204.66,2024-08-02,Deutschland,voucher,9.8,0
+c7b584b8-3dd4-45a8-b8f1-47ac88339f70,CUST-5418,Gaming Mouse,6,133.57,2024-09-05,GERMANY,debit_card,5.3,0
+ae85e321-2f03-4e80-9b8d-f380da07db81,CUST-3568,Cable Organiser,5,22.59,17/01/2024,germany,voucher,13.8,0
+f2e56b79-a5dc-4386-8787-15c6ac6b6302,CUST-8014,Desk Lamp,1,30.50,10/10/2024,France,debit_card,29.9,0
+147466b9-4aa9-49b3-b28b-881a12f79976,CUST-8711,Desk Lamp,1,70.60,2024-06-16,U.K.,credit_card,27.4,0
+28ae9b82-51b2-4f87-b1d8-c9e01648aa38,CUST-3174,Webcam HD,4,146.37,05/08/2024,netherlands,debit_card,13.6,False
+ee7810e4-b724-47f2-83ef-08d68c3415dd,CUST-3271,Mouse Pad XL,8,9.69,27/11/2024,The Netherlands,bank_transfer,13.8,False
+f0ee71bb-48ba-4b2b-bbbd-898b10028bf7,CUST-5859,Laptop Stand,1,114.26,04/04/2024,sweden,voucher,25.8,1
+1f3cb2f4-a3e6-42c0-88d8-9d211454e603,CUST-7274,Webcam HD,2,66.10,04/10/2024,united kingdom,voucher,10.1,0
+5e9f79b9-66eb-40fa-8aa0-0f1403bbd42e,CUST-2860,HDMI Adapter,9,56.69,2024-01-21,Deutschland,voucher,21.3,0
+725dfa56-f52f-468a-b415-3328e49de4f5,CUST-7108,Webcam HD,2,224.77,2024-12-25,united kingdom,bank_transfer,8.0,0
+b8ab3b8a-1abb-43e4-8d0f-14f434e89dea,CUST-8501,USB-C Hub,4,41.19,13/09/2024,UK,bank_transfer,16.0,0
+e0ff30d3-f703-41bb-aa62-9ed561c378de,CUST-5803,Laptop Stand,1,287.19,2024-04-01,SWEDEN,voucher,20.9,False
+61f39123-96ac-4f7e-9f2e-96e25f9cb984,CUST-6503,Laptop Stand,9,128.93,2024-03-08,GERMANY,paypal,,False
+d2e4822b-4487-4b57-bcee-4724d5142cac,CUST-4715,SSD 1TB,5,210.56,05/09/2024,GERMANY,paypal,9.1,0
+30d2275c-940a-483c-bcf8-6872b522243d,CUST-3641,Gaming Mouse,3,88.88,2024-01-25,Germany,credit_card,4.8,False
+d286ff46-ddb4-4707-a7c5-1f6b3b0c2e21,CUST-8347,RAM 16GB,6,135.05,11/06/2024,germany,voucher,21.2,0
+dd07158d-15bd-45c1-bf94-936bc263c541,CUST-9313,Webcam HD,9,12.34,2024-06-03,United Kingdom,bank_transfer,28.4,False
+86bd0635-0c18-462f-a0ed-1fc19a173fdb,CUST-8847,Screen Cleaner Kit,2,227.47,28/05/2024,France,debit_card,24.0,0
+cc8b9163-298e-40e1-9012-78ee03b9cd18,CUST-9625,Gaming Mouse,4,95.87,13/12/2024,sweden,debit_card,13.4,False
+dded3634-ab96-4bae-8ef7-6f732f0bd861,CUST-9381,Wireless Headphones,10,255.58,2024-01-12,FRANCE,paypal,29.3,0
+3dcb31ff-9959-4d16-9822-cf6610ce1000,CUST-4533,Desk Lamp,2,256.86,2024-07-22,sweden,bank_transfer,8.5,0
+ad6e69fd-960b-40b9-adcb-d47383626899,CUST-5968,SSD 1TB,4,242.66,2024-08-14,GERMANY,credit_card,26.9,False
+f45be578-0e45-4bfc-b3e9-68d0c898465c,CUST-7254,Monitor Stand,3,31.08,29/10/2024,Deutschland,credit_card,12.4,False
+606d6bb4-9146-48a9-8d88-337ef3cd5448,CUST-3034,HDMI Adapter,8,94.64,03/06/2024,FRANCE,paypal,0.8,1
+f66d05b4-fa51-488a-a017-30fa758086e4,CUST-6927,Ethernet Cable,10,272.49,2024-08-01,united kingdom,voucher,,0
+fdf79fff-bfa5-4b59-af7f-cf1ad314c953,CUST-1958,Mechanical Keyboard,3,190.25,11/08/2024,france,bank_transfer,3.6,False
+b69cbb4f-e9fa-49e5-89f8-9c970cbe6610,CUST-2258,RAM 16GB,9,53.17,2024-12-20,France,debit_card,27.4,0
+501aaaa1-09a4-4682-8c75-8cd264ab1a88,CUST-9755,Ethernet Cable,2,54.30,18/02/2024,france,debit_card,25.3,0
+67786840-3201-4df0-9623-d0a06d88a989,CUST-4622,Mouse Pad XL,9,88.01,2024-01-07,germany,voucher,27.6,False
+1011a6e6-1724-4076-8a34-c4eb24899ea8,CUST-2909,Mouse Pad XL,2,285.98,10/11/2024,Netherlands,credit_card,21.1,0
+b944e392-5d3c-4cb8-bfcb-d63833e7c489,CUST-1471,Desk Lamp,5,208.85,2024-09-02,Germany,debit_card,29.6,0
+619f15bf-6775-4a16-8e84-b1eda7b6cdc9,CUST-8934,Cable Organiser,1,46.99,06/03/2024,united kingdom,credit_card,3.9,True
+e0d06465-cc4c-4e26-bdc6-e0a7e26a6370,CUST-2581,Cable Organiser,1,238.94,2024-04-10,France,voucher,3.6,False
+308e9613-100c-4ae4-ae48-83f4511715cd,CUST-6770,Mechanical Keyboard,6,64.00,15/04/2024,SWEDEN,voucher,,0
+84a822e1-2dcf-40e6-b6bf-fdf6d1744872,CUST-1070,Desk Lamp,9,25.15,03/05/2024,Germany,debit_card,15.9,0
+1343f55c-9a5f-4fdc-a369-1a3c3dccd589,CUST-4510,RAM 16GB,7,145.03,15/09/2024,Netherlands,bank_transfer,20.2,0
+74ffe6c4-7402-477e-9813-c8fa5289aa61,CUST-2347,Webcam HD,1,97.70,27/02/2024,sweden,credit_card,14.9,0

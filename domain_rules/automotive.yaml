@@ -1,0 +1,49 @@
+domain: automotive
+
+detection_keywords:
+  - vehicle
+  - vin
+  - make
+  - model
+  - year
+  - mileage
+  - odometer
+  - engine
+  - fuel
+  - transmission
+  - registration
+  - plate
+  - dealer
+  - service
+  - mot
+  - chassis
+  - manufacturer
+  - horsepower
+  - torque
+  - ev
+  - hybrid
+  - emission
+  - co2
+
+sensitive_columns:
+  - vin
+  - registration_plate
+  - owner_name
+  - owner_address
+
+required_transforms:
+  - standardise_vin_to_uppercase        # VINs must be 17-char uppercase
+  - standardise_registration_to_uppercase
+  - standardise_dates_to_iso8601
+  - normalise_fuel_type_categories      # petrol/diesel/electric/hybrid canonical values
+
+forbidden_transforms:
+  - drop_null_rows      # Null vehicle fields (e.g. missing mileage) are valid incomplete records
+
+validation_rules:
+  vin_length: "VIN must be exactly 17 characters after standardisation"
+  year_range: "Vehicle year must be between 1886 and current_year + 1"
+  mileage_non_negative: "Mileage/odometer columns must be >= 0"
+  date_iso8601: "All date columns must be ISO 8601 after transformation"
+
+default_watermark_column: service_date

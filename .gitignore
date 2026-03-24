@@ -1,0 +1,41 @@
+# Environment — never commit credentials
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Data (auto-generated, can be large)
+data/
+*.parquet
+*.duckdb
+
+# Pipeline outputs and logs (auto-generated per run)
+outputs/
+logs/
+
+# Testing artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS / Windows
+.DS_Store
+Thumbs.db

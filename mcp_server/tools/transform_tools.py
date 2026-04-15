@@ -20,6 +20,55 @@ from sandbox.executor import run_sandboxed
 
 _MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
 
+# ---------------------------------------------------------------------------
+# Tool schemas — force structured output via tool_choice, no text parsing
+# ---------------------------------------------------------------------------
+
+_GENERATE_TRANSFORM_TOOL = {
+    "name": "submit_transform_code",
+    "description": "Submit the generated Python transformation script and metadata.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "string",
+                "description": "Complete, self-contained Python script that reads INPUT_PATH and writes to OUTPUT_PATH.",
+            },
+            "transformations_applied": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Short names of each transformation applied, e.g. ['dedup', 'parse_dates', 'gbp_to_usd'].",
+            },
+            "output_columns": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Column names present in the output Parquet file.",
+            },
+        },
+        "required": ["code", "transformations_applied", "output_columns"],
+    },
+}
+
+_REFINE_TRANSFORM_TOOL = {
+    "name": "submit_refined_code",
+    "description": "Submit the revised Python transformation script after applying the requested change.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "revised_code": {
+                "type": "string",
+                "description": "Updated Python script with only the requested change applied.",
+            },
+            "changes_summary": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Brief description of each change made.",
+            },
+        },
+        "required": ["revised_code", "changes_summary"],
+    },
+}
+
 
 # ---------------------------------------------------------------------------
 # generate_transform_code
@@ -113,38 +162,18 @@ REQUIREMENTS FOR THE SCRIPT:
 7. Do NOT apply any forbidden transforms listed above
 8. DO apply all required transforms listed above
 
-Return a JSON object with these exact keys:
-{{
-  "code": "<complete Python script as a single string>",
-  "transformations_applied": ["<list of transform names actually applied>"],
-  "output_columns": ["<list of output column names>"]
-}}"""
+Use the submit_transform_code tool to return the script and metadata."""
 
     message = await client.messages.create(
         model=_MODEL(),
         max_tokens=4096,
+        tools=[_GENERATE_TRANSFORM_TOOL],
+        tool_choice={"type": "tool", "name": "submit_transform_code"},
         messages=[{"role": "user", "content": prompt}],
         timeout=90.0,
     )
 
-    text = message.content[0].text.strip()
-    if "```" in text:
-        # Strip any opening fence (```json, ```python, ``` etc.) and closing fence
-        parts = text.split("```")
-        # parts[1] is the fenced content
-        text = parts[1] if len(parts) >= 2 else text
-        # Remove language tag (json, python, etc.) from first line
-        lines = text.splitlines()
-        if lines and lines[0].strip().isalpha():
-            text = "\n".join(lines[1:])
-    text = text.strip()
-    if not text:
-        raise ValueError("LLM returned empty response for generate_transform_code")
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"LLM returned malformed JSON for generate_transform_code: {e}\nRaw: {text[:300]}")
-
+    result = message.content[0].input
     return {
         "code": result["code"],
         "transformations_applied": result.get("transformations_applied", []),
@@ -187,32 +216,17 @@ ORIGINAL CODE:
 ```
 
 Apply ONLY the requested change. Do not refactor unrelated code.
-
-Return a JSON object:
-{{
-  "revised_code": "<updated Python script>",
-  "changes_summary": ["<brief description of each change made>"]
-}}"""
+Use the submit_refined_code tool to return the updated script."""
 
     message = await client.messages.create(
         model=_MODEL(),
         max_tokens=4096,
+        tools=[_REFINE_TRANSFORM_TOOL],
+        tool_choice={"type": "tool", "name": "submit_refined_code"},
         messages=[{"role": "user", "content": prompt}],
     )
 
-    text = message.content[0].text.strip()
-    if "```" in text:
-        parts = text.split("```")
-        text = parts[1] if len(parts) >= 2 else text
-        lines = text.splitlines()
-        if lines and lines[0].strip().isalpha():
-            text = "\n".join(lines[1:])
-    text = text.strip()
-    try:
-        result = json.loads(text)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"LLM returned malformed JSON for refine_transform_code: {e}\nRaw: {text[:300]}")
-
+    result = message.content[0].input
     return {
         "revised_code": result["revised_code"],
         "changes_summary": result.get("changes_summary", []),

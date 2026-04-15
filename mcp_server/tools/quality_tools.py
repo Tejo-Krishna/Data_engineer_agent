@@ -18,6 +18,35 @@ from db import get_duckdb_conn, get_postgres_pool
 
 _MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
 
+_EXPLAIN_ANOMALIES_TOOL = {
+    "name": "submit_anomaly_explanations",
+    "description": "Submit plain-English explanations for the detected anomalies.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "explanations": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "column": {"type": "string"},
+                        "anomaly_count": {"type": "integer"},
+                        "explanation": {"type": "string"},
+                        "likely_cause": {"type": "string"},
+                        "recommended_action": {"type": "string"},
+                    },
+                    "required": ["column", "anomaly_count", "explanation", "likely_cause", "recommended_action"],
+                },
+            },
+            "overall_summary": {
+                "type": "string",
+                "description": "1-2 sentence summary of overall data quality health.",
+            },
+        },
+        "required": ["explanations", "overall_summary"],
+    },
+}
+
 
 # ---------------------------------------------------------------------------
 # run_quality_checks
@@ -369,35 +398,17 @@ DOMAIN CONTEXT:
 {json.dumps(domain_context.get('validation_rules', {}), indent=2)}
 
 For each column with anomalies, provide a concise explanation.
-
-Return a JSON object:
-{{
-  "explanations": [
-    {{
-      "column": "<column name>",
-      "anomaly_count": <int>,
-      "explanation": "<what is wrong in plain English>",
-      "likely_cause": "<most probable data quality root cause>",
-      "recommended_action": "<what should be done to fix it>"
-    }}
-  ],
-  "overall_summary": "<1-2 sentence summary of data quality health>"
-}}"""
+Use the submit_anomaly_explanations tool to return your analysis."""
 
     message = await client.messages.create(
         model=_MODEL(),
         max_tokens=2048,
+        tools=[_EXPLAIN_ANOMALIES_TOOL],
+        tool_choice={"type": "tool", "name": "submit_anomaly_explanations"},
         messages=[{"role": "user", "content": prompt}],
     )
 
-    text = message.content[0].text.strip()
-    if text.startswith("```"):
-        parts = text.split("```")
-        text = parts[1]
-        if text.startswith("json"):
-            text = text[4:]
-    result = json.loads(text.strip())
-
+    result = message.content[0].input
     return {
         "explanations": result.get("explanations", []),
         "overall_summary": result.get("overall_summary", ""),

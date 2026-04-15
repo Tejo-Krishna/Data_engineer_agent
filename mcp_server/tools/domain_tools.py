@@ -13,6 +13,28 @@ from pathlib import Path
 import anthropic
 import yaml
 
+_CLASSIFY_DOMAIN_TOOL = {
+    "name": "submit_domain_classification",
+    "description": "Submit the domain classification result for the dataset.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "domain": {
+                "type": "string",
+                "enum": ["financial", "medical", "automotive", "employment", "retail", "unknown"],
+                "description": "The business domain this dataset belongs to.",
+            },
+            "confidence": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Confidence score for the classification (0.0-1.0).",
+            },
+        },
+        "required": ["domain", "confidence"],
+    },
+}
+
 _DOMAIN_RULES_DIR = Path(os.getenv("DOMAIN_RULES_DIR", "domain_rules"))
 
 # Keyword sets per domain — used in stage-1 heuristic detection
@@ -141,14 +163,15 @@ Column names: {column_names}
 Sample values (up to 3 per column): {sample_preview}
 User goal: {user_goal}
 
-Respond with a JSON object only, no explanation:
-{{"domain": "<domain>", "confidence": <0.0-1.0>}}"""
+Use the submit_domain_classification tool to return your answer."""
 
     for attempt in range(5):
         try:
             message = await client.messages.create(
                 model=model,
                 max_tokens=100,
+                tools=[_CLASSIFY_DOMAIN_TOOL],
+                tool_choice={"type": "tool", "name": "submit_domain_classification"},
                 messages=[{"role": "user", "content": prompt}],
             )
             break
@@ -157,15 +180,7 @@ Respond with a JSON object only, no explanation:
                 raise
             await asyncio.sleep(2 ** attempt)  # 1s, 2s, 4s, 8s
 
-    import json
-    text = message.content[0].text.strip()
-    # Strip markdown code fences if present
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-    result = json.loads(text.strip())
-
+    result = message.content[0].input
     return {
         "domain": result.get("domain", "unknown"),
         "confidence": round(float(result.get("confidence", 0.5)), 3),

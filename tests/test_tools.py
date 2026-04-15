@@ -273,7 +273,9 @@ async def test_detect_domain_retail_by_keyword():
     )
 
     assert result["domain"] == "retail"
-    assert result["confidence"] >= 0.60
+    assert result["confidence"] >= 0.75, (
+        f"Expected high confidence for obvious retail columns, got {result['confidence']}"
+    )
     assert result["method"] == "keyword_heuristic"
 
 

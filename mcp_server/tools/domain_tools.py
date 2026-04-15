@@ -29,6 +29,8 @@ _DOMAIN_KEYWORDS: dict[str, list[str]] = {
         "procedure", "nhs", "lab", "test", "result", "symptom",
         "treatment", "physician", "doctor", "nurse", "vital",
         "blood", "glucose", "blood_pressure", "heart_rate",
+        "patient_id", "diagnosis_code", "dosage_mg", "ward",
+        "medical_record", "ehr", "fhir", "mrn",
     ],
     "automotive": [
         "vehicle", "vin", "make", "model", "mileage", "odometer",
@@ -82,8 +84,9 @@ async def detect_domain(
     second_score = sorted_scores[1] if len(sorted_scores) > 1 else 0.0
     gap = best_score - second_score
 
-    if best_score >= 0.30 and gap >= 0.15:
-        confidence = min(0.95, best_score * 2)
+    best_hits = round(best_score * len(_DOMAIN_KEYWORDS[best_domain]))
+    if (best_score >= 0.30 or best_hits >= 5) and gap >= 0.15:
+        confidence = min(0.95, best_score * 2 + gap)
         return {
             "domain": best_domain,
             "confidence": round(confidence, 3),
@@ -149,7 +152,7 @@ Respond with a JSON object only, no explanation:
                 messages=[{"role": "user", "content": prompt}],
             )
             break
-        except anthropic.OverloadedError:
+        except anthropic.RateLimitError:
             if attempt == 4:
                 raise
             await asyncio.sleep(2 ** attempt)  # 1s, 2s, 4s, 8s

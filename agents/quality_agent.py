@@ -256,7 +256,8 @@ def _build_context(state: PipelineState) -> str:
         f"Rows output: {state.get('rows_output', 0)}",
         f"Transformations applied: {json.dumps(state.get('transformations_applied', []))}",
         f"Domain: {state.get('domain', 'unknown')}",
-        f"Schema: {json.dumps({col: v.get('inferred_type') for col, v in schema.items()}, indent=2)}",
+        f"Schema ({min(len(schema), 40)} of {len(schema)} columns): "
+        f"{json.dumps({col: v.get('inferred_type') for col, v in list(schema.items())[:40]}, indent=2)}",
     ]
 
     if high_null:

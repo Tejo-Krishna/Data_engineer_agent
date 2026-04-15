@@ -242,7 +242,9 @@ async def test_pipeline_domain_detection():
             pass
 
     assert final.get("domain") == "retail"
-    assert final.get("domain_confidence", 0) >= 0.60
+    assert final.get("domain_confidence", 0) >= 0.75, (
+        f"Expected high confidence for obvious retail data, got {final.get('domain_confidence')}"
+    )
 
 
 @pytest.mark.e2e

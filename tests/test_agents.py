@@ -462,7 +462,16 @@ async def test_quality_agent_success_sets_quality_passed():
         domain_context={"validation_rules": {}},
     )
 
-    result = await run_quality_agent(state, _make_config(mcp))
+    _llm = AsyncMock(side_effect=[
+        _FakeResp([("run_quality_checks", {"output_path": "outputs/test-run-001/sales_cleaned.parquet"})]),
+        _FakeResp([("detect_anomalies", {"target_columns": ["quantity"]})]),
+        _FakeResp([("explain_anomalies", {"anomaly_summary": {}, "profile": {}})]),
+        _FakeResp([("write_quality_report", {"pipeline_run_id": "test-run-001"})]),
+        _FakeResp(),
+    ])
+
+    with patch("agents.quality_agent.call_llm_with_tools", _llm):
+        result = await run_quality_agent(state, _make_config(mcp))
 
     assert result["quality_passed"] is True
     assert result["status"] == "success"
@@ -497,7 +506,14 @@ async def test_quality_agent_failed_checks_set_retrying():
         domain_context={"validation_rules": {}},
     )
 
-    result = await run_quality_agent(state, _make_config(mcp))
+    _llm = AsyncMock(side_effect=[
+        _FakeResp([("run_quality_checks", {"output_path": "outputs/test-run-001/sales_cleaned.parquet"})]),
+        _FakeResp([("write_quality_report", {"pipeline_run_id": "test-run-001"})]),
+        _FakeResp(),
+    ])
+
+    with patch("agents.quality_agent.call_llm_with_tools", _llm):
+        result = await run_quality_agent(state, _make_config(mcp))
 
     assert result["quality_passed"] is False
     assert result["status"] == "retrying"
@@ -529,12 +545,19 @@ async def test_quality_agent_blocks_save_to_library_when_failed():
         domain_context={"validation_rules": {}},
     )
 
-    await run_quality_agent(state, _make_config(mcp))
+    # LLM incorrectly tries save_to_library — agent guard must block it
+    _llm = AsyncMock(side_effect=[
+        _FakeResp([("run_quality_checks", {"output_path": "outputs/test-run-001/sales_cleaned.parquet"})]),
+        _FakeResp([("save_to_library", {"code": "...", "user_goal": "clean"})]),
+        _FakeResp([("write_quality_report", {"pipeline_run_id": "test-run-001"})]),
+        _FakeResp(),
+    ])
 
-    # save_to_library must never have been actually called (it was blocked)
-    real_calls = [t for t in mcp.called_tools() if t == "save_to_library"]
-    # The guard returns a fake result without calling mcp.call for save_to_library
-    # So the tool should NOT appear in mcp.calls
+    with patch("agents.quality_agent.call_llm_with_tools", _llm):
+        await run_quality_agent(state, _make_config(mcp))
+
+    # The guard intercepts save_to_library and returns a fake result without
+    # calling mcp.call — so it must NOT appear in mcp.calls
     assert "save_to_library" not in mcp.called_tools()
 
 

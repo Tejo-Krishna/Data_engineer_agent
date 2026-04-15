@@ -6,6 +6,7 @@ execute_code delegates to sandbox/executor.py — never call it
 before the HITL checkpoint has approved.
 """
 
+import asyncio
 import json
 import os
 from pathlib import Path
@@ -127,15 +128,22 @@ Return a JSON object with these exact keys:
     )
 
     text = message.content[0].text.strip()
-    if text.startswith("```"):
+    if "```" in text:
+        # Strip any opening fence (```json, ```python, ``` etc.) and closing fence
         parts = text.split("```")
-        text = parts[1]
-        if text.startswith("json"):
-            text = text[4:]
+        # parts[1] is the fenced content
+        text = parts[1] if len(parts) >= 2 else text
+        # Remove language tag (json, python, etc.) from first line
+        lines = text.splitlines()
+        if lines and lines[0].strip().isalpha():
+            text = "\n".join(lines[1:])
     text = text.strip()
     if not text:
         raise ValueError("LLM returned empty response for generate_transform_code")
-    result = json.loads(text)
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"LLM returned malformed JSON for generate_transform_code: {e}\nRaw: {text[:300]}")
 
     return {
         "code": result["code"],
@@ -193,12 +201,17 @@ Return a JSON object:
     )
 
     text = message.content[0].text.strip()
-    if text.startswith("```"):
+    if "```" in text:
         parts = text.split("```")
-        text = parts[1]
-        if text.startswith("json"):
-            text = text[4:]
-    result = json.loads(text.strip())
+        text = parts[1] if len(parts) >= 2 else text
+        lines = text.splitlines()
+        if lines and lines[0].strip().isalpha():
+            text = "\n".join(lines[1:])
+    text = text.strip()
+    try:
+        result = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"LLM returned malformed JSON for refine_transform_code: {e}\nRaw: {text[:300]}")
 
     return {
         "revised_code": result["revised_code"],
@@ -227,7 +240,8 @@ async def execute_code(
              rows_input (int | None), rows_output (int | None),
              execution_time_ms (int).
     """
-    return run_sandboxed(
+    return await asyncio.to_thread(
+        run_sandboxed,
         code=code,
         input_path=input_path,
         output_path=output_path,

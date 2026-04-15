@@ -383,17 +383,24 @@ def _build_context(state: PipelineState) -> str:
             "Fix this specific issue. Do not change parts of the code that worked."
         )
 
-    schema_summary = {
+    full_schema = {
         col: v.get("inferred_type", "unknown")
         for col, v in (state.get("schema") or {}).items()
     }
+    schema_items = list(full_schema.items())
+    truncated = len(schema_items) > 40
+    schema_summary = dict(schema_items[:40])
+    schema_note = (
+        f" (showing 40 of {len(schema_items)} columns — full schema passed to generate_transform_code)"
+        if truncated else ""
+    )
 
     parts = [
         f"User goal: {goal}",
         f"Source path: {state['source_path']}",
         f"Source type: {state['source_type']}",
         f"Incremental mode: {state.get('incremental_mode', False)}",
-        f"Schema: {json.dumps(schema_summary, indent=2)}",
+        f"Schema{schema_note}: {json.dumps(schema_summary, indent=2)}",
     ]
 
     domain_ctx = state.get("domain_context") or {}

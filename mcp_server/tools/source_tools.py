@@ -276,3 +276,15 @@ async def detect_new_rows(
         }
     finally:
         conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Tool registry — imported by server.py to build TOOL_HANDLERS
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "connect_csv": connect_csv,
+    "connect_postgres": connect_postgres,
+    "connect_api": connect_api,
+    "detect_new_rows": detect_new_rows,
+}

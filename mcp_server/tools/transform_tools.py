@@ -18,7 +18,21 @@ from db import get_duckdb_conn
 from sandbox.executor import run_sandboxed
 
 
-_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+# Sonnet only for code generation — failures here trigger expensive retries
+_CODEGEN_MODEL = lambda: os.getenv("CODEGEN_MODEL", "claude-sonnet-4-5")
+# Haiku for targeted edits and semantic verification
+_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+_VERIFY_MODEL = "claude-haiku-4-5-20251001"
+# Files larger than this threshold get DuckDB SQL mode instead of pandas
+_LARGE_FILE_THRESHOLD_MB: float = float(os.getenv("LARGE_FILE_THRESHOLD_MB", "500"))
+
+
+def _check_file_size(path: str) -> float:
+    """Return file size in MB, or 0.0 if the file cannot be stat'd."""
+    try:
+        return Path(path).stat().st_size / (1024 * 1024)
+    except OSError:
+        return 0.0
 
 # ---------------------------------------------------------------------------
 # Tool schemas — force structured output via tool_choice, no text parsing
@@ -81,6 +95,7 @@ async def generate_transform_code(
     domain_context: dict,
     library_snippets: list | None = None,
     failure_reason: str | None = None,
+    large_file: bool = False,
 ) -> dict:
     """
     Generate a Python transformation script for the given dataset and goal.
@@ -135,7 +150,32 @@ async def generate_transform_code(
         if col not in ("total_rows", "duplicate_row_count")
     }
 
-    prompt = f"""You are a data engineering expert. Write a Python script to transform the dataset.
+    if large_file:
+        requirements_block = """REQUIREMENTS FOR THE SCRIPT (LARGE FILE — DuckDB streaming mode):
+1. Use DuckDB in-process — do NOT use pandas. The dataset is too large to fit in memory.
+2. Read from os.environ["INPUT_PATH"] using DuckDB: conn.execute("SELECT * FROM read_parquet(?)", [input_path]) or read_csv_auto depending on extension.
+3. Write output to os.environ["OUTPUT_PATH"] using: conn.execute("COPY (SELECT ...) TO ? (FORMAT PARQUET)", [output_path])
+4. Print exactly "ROWS_IN: N" before any processing — get count with conn.execute("SELECT COUNT(*) FROM read_parquet(?) / read_csv_auto(?)", [input_path]).fetchone()[0]
+5. Print exactly "ROWS_OUT: N" after writing — get count from output file the same way
+6. Import only: os, duckdb — nothing else
+7. Handle nulls gracefully — use COALESCE / NULLIF in SQL, or TRY_CAST for type conversions
+8. Do NOT apply any forbidden transforms listed above
+9. DO apply all required transforms listed above
+10. DuckDB SQL equivalents: dedup → SELECT DISTINCT; date parse → TRY_CAST(col AS DATE); currency strip → REGEXP_REPLACE(col, '[^0-9.]', '')"""
+    else:
+        requirements_block = """REQUIREMENTS FOR THE SCRIPT:
+1. Read input from os.environ["INPUT_PATH"] — use pandas to read CSV or Parquet by file extension
+2. Write output to os.environ["OUTPUT_PATH"] as Parquet
+3. Print exactly "ROWS_IN: N" before any processing (N = len of input dataframe)
+4. Print exactly "ROWS_OUT: N" after writing (N = len of output dataframe)
+5. Import only: os, pandas, pyarrow, datetime, re, numpy — nothing else
+6. Handle nulls gracefully — do not crash on missing values
+7. Do NOT apply any forbidden transforms listed above
+8. DO apply all required transforms listed above"""
+
+    mode_note = "\n⚠️  LARGE FILE MODE: Use DuckDB SQL — do NOT use pandas." if large_file else ""
+
+    prompt = f"""You are a data engineering expert. Write a Python script to transform the dataset.{mode_note}
 
 USER GOAL: {user_goal}
 
@@ -152,20 +192,12 @@ VALIDATION RULES: {json.dumps(validation_rules, indent=2)}
 {snippet_block}
 {failure_block}
 
-REQUIREMENTS FOR THE SCRIPT:
-1. Read input from os.environ["INPUT_PATH"] — use pandas to read CSV or Parquet by file extension
-2. Write output to os.environ["OUTPUT_PATH"] as Parquet
-3. Print exactly "ROWS_IN: N" before any processing (N = len of input dataframe)
-4. Print exactly "ROWS_OUT: N" after writing (N = len of output dataframe)
-5. Import only: os, pandas, pyarrow, datetime, re, numpy — nothing else
-6. Handle nulls gracefully — do not crash on missing values
-7. Do NOT apply any forbidden transforms listed above
-8. DO apply all required transforms listed above
+{requirements_block}
 
 Use the submit_transform_code tool to return the script and metadata."""
 
     message = await client.messages.create(
-        model=_MODEL(),
+        model=_CODEGEN_MODEL(),
         max_tokens=4096,
         tools=[_GENERATE_TRANSFORM_TOOL],
         tool_choice={"type": "tool", "name": "submit_transform_code"},
@@ -281,7 +313,9 @@ async def write_dataset(
     Returns: output_path (str), row_count (int), file_size_mb (float),
              columns (list[str]), schema (dict[str, str]).
     """
-    output_dir = Path(os.getenv("OUTPUT_DIR", "outputs")) / run_id
+    # Write to staging/ — main.py calls finalize_run() to rename staging→final
+    # after the catalogue agent completes successfully.
+    output_dir = Path(os.getenv("OUTPUT_DIR", "outputs")) / run_id / "staging"
     output_dir.mkdir(parents=True, exist_ok=True)
     final_path = output_dir / f"{output_name}.parquet"
 
@@ -305,3 +339,114 @@ async def write_dataset(
         "columns": columns,
         "schema": schema,
     }
+
+
+# ---------------------------------------------------------------------------
+# verify_transform_intent
+# ---------------------------------------------------------------------------
+
+_VERIFY_INTENT_TOOL = {
+    "name": "submit_intent_verification",
+    "description": "Submit the semantic intent verification result.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "intent_matched": {
+                "type": "boolean",
+                "description": "True if the output data matches the user's stated goal.",
+            },
+            "confidence": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "description": "Confidence in the verdict (0-1).",
+            },
+            "issues": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "List of specific mismatches found, empty if intent_matched=True.",
+            },
+        },
+        "required": ["intent_matched", "confidence", "issues"],
+    },
+}
+
+
+async def verify_transform_intent(
+    user_goal: str,
+    input_path: str,
+    output_path: str,
+    transformations_applied: list[str],
+) -> dict:
+    """
+    Verify that the executed transformation semantically matches the user's goal.
+
+    Use when: execute_code succeeded and you need lightweight semantic confirmation
+    before writing the dataset to permanent storage.
+    Do NOT use when: execute_code failed — only verify successful outputs.
+    Returns: intent_matched (bool), confidence (float 0-1), issues (list[str]).
+    """
+    # Sample 5 rows from input and output — keeps the prompt tiny for Haiku
+    conn = get_duckdb_conn()
+    try:
+        ext_in = Path(input_path).suffix.lower()
+        if ext_in in (".parquet", ".pq"):
+            in_rows = conn.execute(
+                f"SELECT * FROM read_parquet('{input_path}') LIMIT 5"
+            ).df().to_dict(orient="records")
+        else:
+            in_rows = conn.execute(
+                f"SELECT * FROM read_csv_auto('{input_path}') LIMIT 5"
+            ).df().to_dict(orient="records")
+
+        out_rows = conn.execute(
+            f"SELECT * FROM read_parquet('{output_path}') LIMIT 5"
+        ).df().to_dict(orient="records")
+    finally:
+        conn.close()
+
+    # Truncate values to keep token count low
+    def _trim(rows: list[dict], max_val: int = 40) -> list[dict]:
+        return [{k: str(v)[:max_val] for k, v in row.items()} for row in rows]
+
+    prompt = f"""You are verifying a data transformation matches the user's intent.
+
+USER GOAL: {user_goal}
+TRANSFORMATIONS APPLIED: {transformations_applied}
+
+INPUT SAMPLE (5 rows):
+{json.dumps(_trim(in_rows), indent=2)}
+
+OUTPUT SAMPLE (5 rows):
+{json.dumps(_trim(out_rows), indent=2)}
+
+Does the output match the goal? Use submit_intent_verification to respond."""
+
+    client = anthropic.AsyncAnthropic()
+    message = await client.messages.create(
+        model=_VERIFY_MODEL,
+        max_tokens=256,
+        tools=[_VERIFY_INTENT_TOOL],
+        tool_choice={"type": "tool", "name": "submit_intent_verification"},
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    result = message.content[0].input
+    return {
+        "intent_matched": bool(result.get("intent_matched", True)),
+        "confidence": round(float(result.get("confidence", 0.5)), 3),
+        "issues": result.get("issues", []),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "generate_transform_code": generate_transform_code,
+    "refine_transform_code": refine_transform_code,
+    "execute_code": execute_code,
+    "write_dataset": write_dataset,
+    "verify_transform_intent": verify_transform_intent,
+}

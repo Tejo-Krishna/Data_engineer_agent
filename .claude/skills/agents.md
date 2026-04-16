@@ -259,37 +259,119 @@ Rules:
 
 This agent is small. It has a predictable two-step flow.
 
+**Critical:** `load_domain_rules` returns a flat dict directly — NOT a nested
+`{"rules": {...}}` wrapper. Always use `rules_result` as `domain_context`, not
+`rules_result.get("rules", {})` (that always returns `{}`).
+
 ```python
 async def run_domain_agent(state, mcp, logger):
+    require_profiler_output(state)   # raises StateBoundaryError if profile/schema missing
     logger.agent_start("domain")
 
     # Step 1: detect domain
     domain_result = await mcp.call("detect_domain", {
         "column_names": list(state["schema"].keys()),
         "sample_values": {k: v["sample_values"]
-                         for k, v in state["profile"].items()},
+                         for k, v in state["profile"].items()
+                         if k in state["schema"]},
         "user_goal": state["user_goal"]
     })
     logger.tool_call("domain", "detect_domain", {},
                      {"domain": domain_result["domain"],
                       "confidence": domain_result["confidence"]})
 
-    # Step 2: load rules
-    rules = await mcp.call("load_domain_rules", {
+    # Step 2: load rules — returns a flat dict, use it directly as domain_context
+    rules_result = await mcp.call("load_domain_rules", {
         "domain": domain_result["domain"]
     })
+    domain_context = rules_result if isinstance(rules_result, dict) else {}
     logger.tool_call("domain", "load_domain_rules",
                      {"domain": domain_result["domain"]},
-                     {"rules_loaded": bool(rules.get("rules"))})
+                     {"required": len(domain_context.get("required_transforms", [])),
+                      "forbidden": len(domain_context.get("forbidden_transforms", []))})
 
     logger.agent_end("domain")
     return {
         **state,
         "domain": domain_result["domain"],
         "domain_confidence": domain_result["confidence"],
-        "domain_context": rules.get("rules", {})
+        "domain_context": domain_context,
     }
 ```
+
+---
+
+## State boundary validators — mandatory at agent entry
+
+Every agent except the profiler must call its boundary validator as the
+very first line, before acquiring mcp/logger/span.
+
+```python
+from orchestrator.state import (
+    require_profiler_output,    # domain agent
+    require_domain_output,      # transformer agent
+    require_transformer_output, # quality agent
+    require_quality_output,     # catalogue agent
+    StateBoundaryError,
+)
+```
+
+Validators check only what the calling agent actually reads — not every
+field the upstream agent wrote. This prevents false failures on edge cases
+(e.g. zero-row datasets where `sample` is `[]`).
+
+| Agent | Validator | Fields checked |
+|-------|-----------|----------------|
+| domain | `require_profiler_output` | `profile`, `schema` |
+| transformer | `require_domain_output` | `domain_context` (non-empty) |
+| quality | `require_transformer_output` | `output_path` |
+| catalogue | `require_quality_output` | `quality_passed is not None` |
+
+The quality agent has a special case: if `output_path` is absent (the
+transformer returned retrying without writing a file), return early
+**before** calling `require_transformer_output`. The validator fires only
+when the transformer produced output but quality still needs to run.
+
+---
+
+## Targeted repair — transformer retry fast-path
+
+On retry runs, attempt a cheap repair before the full ReAct loop:
+
+```python
+if state["retry_count"] > 0 and generated_code and state.get("failure_reason"):
+    repair = await _try_targeted_repair(generated_code, failure_reason, ...)
+    if repair is not None:
+        return {**state, **repair, "status": "running"}
+    # repair returned None — fall through to full ReAct loop
+```
+
+`_try_targeted_repair` calls `refine_transform_code(failure_reason)` →
+`execute_code` → `write_dataset` in 3 direct MCP calls, bypassing the
+LLM planning turn entirely. Returns `None` on any failure so the caller
+can fall back gracefully.
+
+This saves 2–3 Sonnet calls per retry for common errors (import mistakes,
+null handling, type casting). Always attempt it before full regeneration.
+
+---
+
+## Context window management — trim_messages
+
+Call `trim_messages` at the top of every ReAct loop iteration to prevent
+context window overflow across long runs:
+
+```python
+from agents.utils import trim_messages
+
+while tool_call_count < MAX_CALLS:
+    messages = trim_messages(messages, keep_first=1, keep_last=10)
+    response = await call_llm_with_tools(messages, available, mcp_tools)
+```
+
+`keep_first=1` preserves the initial user context (goal + schema).
+`keep_last=10` retains ~5 full tool-call rounds. Middle turns are dropped
+once the message list exceeds 11 entries.
 
 ---
 

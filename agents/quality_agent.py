@@ -27,8 +27,9 @@ from agents.utils import (
     call_llm_with_tools,
     build_tool_results_message,
     extract_tool_calls,
+    trim_messages,
 )
-from orchestrator.state import PipelineState
+from orchestrator.state import PipelineState, require_transformer_output
 
 
 QUALITY_SYSTEM_PROMPT = """You are a data quality analyst.
@@ -58,14 +59,12 @@ async def run_quality_agent(
     state: PipelineState,
     config: RunnableConfig,
 ) -> PipelineState:
-    mcp = config["configurable"]["mcp"]
-    logger = config["configurable"]["logger"]
-    span = logger.agent_start("quality")
-
-    # If the transformer did not produce an output file, quality checks cannot
-    # run. Return immediately without incrementing retry_count — the transformer
-    # already incremented it when execute_code failed.
+    # Verify transformer produced its required outputs before proceeding.
+    # output_path absence is a common retry state — handle it gracefully.
     if not state.get("output_path"):
+        mcp = config["configurable"]["mcp"]
+        logger = config["configurable"]["logger"]
+        span = logger.agent_start("quality")
         logger.agent_end(span)
         return {
             **state,
@@ -74,6 +73,11 @@ async def run_quality_agent(
             "status": "retrying",
             "failure_reason": state.get("failure_reason") or "Transformer did not produce output",
         }
+    require_transformer_output(state)
+
+    mcp = config["configurable"]["mcp"]
+    logger = config["configurable"]["logger"]
+    span = logger.agent_start("quality")
 
     mcp_tools = await mcp.list_tools()
     available = [
@@ -98,7 +102,11 @@ async def run_quality_agent(
     tool_call_count = 0
 
     while tool_call_count < MAX_CALLS:
-        response = await call_llm_with_tools(messages, available, mcp_tools)
+        messages = trim_messages(messages, keep_first=1, keep_last=10)
+        response = await call_llm_with_tools(
+            messages, available, mcp_tools,
+            system_prompt=QUALITY_SYSTEM_PROMPT,
+        )
 
         if response.stop_reason == "end_turn":
             break
@@ -134,8 +142,9 @@ async def run_quality_agent(
             # Inject authoritative values the LLM tends to get wrong.
             if tc["name"] == "write_quality_report":
                 tc["input"]["pipeline_run_id"] = state["run_id"]
+                # Write to staging/ — finalize_run() in main.py promotes it to final/
                 tc["input"]["output_dir"] = str(
-                    Path(os.getenv("OUTPUT_DIR", "outputs")) / state["run_id"]
+                    Path(os.getenv("OUTPUT_DIR", "outputs")) / state["run_id"] / "staging"
                 )
             if tc["name"] == "run_quality_checks":
                 tc["input"]["output_path"] = state.get("output_path") or tc["input"].get("output_path", "")

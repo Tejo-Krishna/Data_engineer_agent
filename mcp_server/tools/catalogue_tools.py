@@ -6,10 +6,8 @@ produces dbt SQL models and YAML artefacts.
 All LLM calls use AsyncAnthropic. Postgres writes use asyncpg via db.py.
 """
 
-import ast
 import json
 import os
-import re
 from pathlib import Path
 
 import anthropic
@@ -22,42 +20,73 @@ def _vec_literal(embedding: list) -> str:
     return "[" + ",".join(str(float(v)) for v in embedding) + "]"
 
 
-def _parse_llm_json(text: str) -> dict:
-    """
-    Parse LLM-returned JSON robustly.
-    Strips markdown fences, tries json.loads, then ast.literal_eval.
-    Falls back to an empty dict rather than crashing the catalogue run.
-    """
-    # Strip ```json ... ``` or ``` ... ``` fences
-    text = text.strip()
-    if text.startswith("```"):
-        # Take the content between the first and last fence
-        inner = re.sub(r"^```[a-zA-Z]*\n?", "", text)
-        inner = re.sub(r"\n?```$", "", inner)
-        text = inner.strip()
-
-    # Primary: standard JSON
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        pass
-
-    # Fallback: Python dict literal (handles single-quoted keys/values)
-    try:
-        result = ast.literal_eval(text)
-        if isinstance(result, dict):
-            return result
-    except (ValueError, SyntaxError):
-        pass
-
-    # Last resort: return empty dict so the rest of the catalogue run can continue
-    return {}
-
-
 from memory.embeddings import embed
 
 
-_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+# Haiku is sufficient for column-to-column mapping — no creative reasoning needed
+_LINEAGE_MODEL = os.getenv("LINEAGE_MODEL", "claude-haiku-4-5-20251001")
+
+# ---------------------------------------------------------------------------
+# Forced-tool-use schemas — structured output for all three LLM calls
+# ---------------------------------------------------------------------------
+
+_COLUMN_DESCRIPTIONS_TOOL = {
+    "name": "submit_column_descriptions",
+    "description": "Submit a one-sentence description for each column in the dataset.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "column_descriptions": {
+                "type": "object",
+                "description": "Mapping of column name → one-sentence description.",
+                "additionalProperties": {"type": "string"},
+            }
+        },
+        "required": ["column_descriptions"],
+    },
+}
+
+_LINEAGE_TOOL = {
+    "name": "submit_lineage_graph",
+    "description": "Submit the column-level lineage mapping between source and output.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "edges": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "source_column": {"type": "string"},
+                        "target_column": {"type": "string"},
+                        "transformation": {
+                            "type": "string",
+                            "description": "Transformation applied, or 'passthrough' if unchanged.",
+                        },
+                    },
+                    "required": ["source_column", "target_column", "transformation"],
+                },
+            }
+        },
+        "required": ["edges"],
+    },
+}
+
+_DBT_MODEL_TOOL = {
+    "name": "submit_dbt_model",
+    "description": "Submit the generated dbt SQL SELECT model.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "sql_content": {
+                "type": "string",
+                "description": "Complete dbt SQL SELECT statement. No markdown fences, no explanation.",
+            }
+        },
+        "required": ["sql_content"],
+    },
+}
 
 
 # ---------------------------------------------------------------------------
@@ -84,7 +113,7 @@ async def write_catalogue_entry(
     """
     client = anthropic.AsyncAnthropic()
 
-    # Generate LLM column descriptions
+    # Generate LLM column descriptions via forced tool use — no JSON parsing needed
     prompt = f"""You are a data catalogue assistant. Write a brief (one sentence) description
 for each column in this dataset.
 
@@ -92,16 +121,16 @@ Dataset name: {dataset_name}
 Transformations applied: {transformations_applied}
 Columns and types: {json.dumps(schema, indent=2)}
 
-Return a JSON object mapping column name to description:
-{{"column_name": "one-sentence description", ...}}"""
+Use the submit_column_descriptions tool to return your answer."""
 
     message = await client.messages.create(
         model=_MODEL(),
         max_tokens=1024,
+        tools=[_COLUMN_DESCRIPTIONS_TOOL],
+        tool_choice={"type": "tool", "name": "submit_column_descriptions"},
         messages=[{"role": "user", "content": prompt}],
     )
-    text = message.content[0].text.strip()
-    column_descriptions: dict = _parse_llm_json(text)
+    column_descriptions: dict = message.content[0].input.get("column_descriptions", {})
 
     # Embed dataset name + column names for similarity search
     embed_text = f"{dataset_name}. Columns: {', '.join(schema.keys())}"
@@ -160,25 +189,16 @@ Source columns: {list(source_schema.keys())}
 Output columns: {list(output_schema.keys())}
 Transformations applied: {transformations_applied}
 
-Return a JSON object:
-{{
-  "edges": [
-    {{
-      "source_column": "<source col name>",
-      "target_column": "<output col name>",
-      "transformation": "<transformation applied, or 'passthrough' if unchanged>"
-    }}
-  ]
-}}"""
+Use the submit_lineage_graph tool to return your answer."""
 
     message = await client.messages.create(
-        model=_MODEL(),
+        model=_LINEAGE_MODEL,
         max_tokens=2048,
+        tools=[_LINEAGE_TOOL],
+        tool_choice={"type": "tool", "name": "submit_lineage_graph"},
         messages=[{"role": "user", "content": prompt}],
     )
-    text = message.content[0].text.strip()
-    lineage_data: dict = _parse_llm_json(text)
-    edges = lineage_data.get("edges", [])
+    edges: list = message.content[0].input.get("edges", [])
 
     # Persist lineage edges to Postgres
     pool = await get_postgres_pool()
@@ -253,17 +273,17 @@ Rules:
 - Use {{ ref('source') }} as the FROM clause
 - Include all output columns in the SELECT
 - Add inline comments explaining each non-trivial transformation
-- Return only the SQL, no explanation
 
-SQL:"""
+Use the submit_dbt_model tool to return the SQL."""
 
     message = await client.messages.create(
         model=_MODEL(),
         max_tokens=2048,
+        tools=[_DBT_MODEL_TOOL],
+        tool_choice={"type": "tool", "name": "submit_dbt_model"},
         messages=[{"role": "user", "content": prompt}],
     )
-    sql_content = re.sub(r"^```[a-zA-Z]*\n?", "", message.content[0].text.strip())
-    sql_content = re.sub(r"\n?```$", "", sql_content).strip()
+    sql_content: str = message.content[0].input.get("sql_content", "").strip()
 
     output_dir = Path(os.getenv("OUTPUT_DIR", "outputs")) / run_id / "dbt" / "models"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -416,3 +436,16 @@ async def generate_dbt_tests(
         f.write(tests_yml_content)
 
     return {"tests_yml_content": tests_yml_content, "file_path": str(file_path)}
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "write_catalogue_entry": write_catalogue_entry,
+    "generate_lineage_graph": generate_lineage_graph,
+    "generate_dbt_model": generate_dbt_model,
+    "read_catalogue": read_catalogue,
+    "generate_dbt_tests": generate_dbt_tests,
+}

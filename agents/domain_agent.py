@@ -13,13 +13,15 @@ Writes to state: domain, domain_confidence, domain_context.
 from langgraph.types import RunnableConfig
 
 from observability.tracing import log_domain_low_confidence
-from orchestrator.state import PipelineState
+from orchestrator.state import PipelineState, require_profiler_output
 
 
 async def run_domain_agent(
     state: PipelineState,
     config: RunnableConfig,
 ) -> PipelineState:
+    require_profiler_output(state)
+
     mcp = config["configurable"]["mcp"]
     logger = config["configurable"]["logger"]
     span = logger.agent_start("domain")
@@ -61,7 +63,8 @@ async def run_domain_agent(
     # ------------------------------------------------------------------
     print(f"  [domain] calling load_domain_rules ({domain}) ...", flush=True)
     rules_result = await mcp.call("load_domain_rules", {"domain": domain})
-    domain_context: dict = rules_result.get("rules", {})
+    # load_domain_rules returns the rule dict directly (not nested under "rules")
+    domain_context: dict = rules_result if isinstance(rules_result, dict) else {}
 
     logger.tool_call(
         span, "domain", "load_domain_rules",

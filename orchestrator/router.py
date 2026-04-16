@@ -18,7 +18,8 @@ from orchestrator.state import PipelineState
 def route_after_quality(state: PipelineState) -> str:
     max_retries = int(os.getenv("MAX_QUALITY_RETRIES", "3"))
 
-    if state.get("status") == "success":
+    if state.get("status") in ("success", "catalogue_pending"):
+        # catalogue_pending means Parquet+quality written but catalogue not yet done
         return "catalogue"
 
     if state.get("status") == "retrying":

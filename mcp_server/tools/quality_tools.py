@@ -16,7 +16,7 @@ import anthropic
 from db import get_duckdb_conn, get_postgres_pool
 
 
-_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 
 _EXPLAIN_ANOMALIES_TOOL = {
     "name": "submit_anomaly_explanations",
@@ -527,3 +527,15 @@ async def write_quality_report(
         "markdown_path": str(md_path),
         "overall_status": overall_status,
     }
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "run_quality_checks": run_quality_checks,
+    "detect_anomalies": detect_anomalies,
+    "explain_anomalies": explain_anomalies,
+    "write_quality_report": write_quality_report,
+}

@@ -222,12 +222,16 @@ async def test_domain_agent_writes_domain_fields():
 
     mcp = MockMCP({
         "detect_domain": {"domain": "retail", "confidence": 0.95, "method": "keyword_heuristic"},
-        "load_domain_rules": {"rules": {
+        # load_domain_rules returns a flat dict — NOT {"rules": {...}}
+        "load_domain_rules": {
+            "domain": "retail",
             "required_transforms": ["title_case_country"],
             "forbidden_transforms": [],
             "sensitive_columns": [],
             "validation_rules": {},
-        }},
+            "default_watermark_column": None,
+            "detection_keywords": [],
+        },
     })
 
     state = _base_state(
@@ -248,7 +252,7 @@ async def test_domain_agent_calls_both_tools():
 
     mcp = MockMCP({
         "detect_domain": {"domain": "retail", "confidence": 0.9, "method": "keyword_heuristic"},
-        "load_domain_rules": {"rules": {}},
+        "load_domain_rules": {"domain": "retail", "required_transforms": [], "forbidden_transforms": [], "sensitive_columns": [], "validation_rules": {}, "default_watermark_column": None, "detection_keywords": []},
     })
 
     await run_domain_agent(
@@ -599,6 +603,7 @@ async def test_catalogue_agent_writes_all_state_fields():
         rows_output=485,
         transformations_applied=["dedup"],
         quality_checks=FAKE_QUALITY_CHECKS,
+        quality_passed=True,   # required by require_quality_output
     )
 
     result = await run_catalogue_agent(state, _make_config(mcp))
@@ -626,7 +631,7 @@ async def test_catalogue_agent_raises_if_no_schema():
     from agents.catalogue_agent import run_catalogue_agent
 
     mcp = MockMCP({})
-    state = _base_state(status="success", schema={}, output_path="some/path.parquet")
+    state = _base_state(status="success", schema={}, output_path="some/path.parquet", quality_passed=True)
 
     with pytest.raises(ValueError, match="schema"):
         await run_catalogue_agent(state, _make_config(mcp))

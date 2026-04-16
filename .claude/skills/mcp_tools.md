@@ -61,15 +61,17 @@ source_tools.py    — connect_csv, connect_postgres, connect_api,
 profiling_tools.py — sample_data, compute_profile, detect_schema,
                      compare_schemas
 transform_tools.py — generate_transform_code, refine_transform_code,
-                     execute_code, write_dataset
+                     execute_code, write_dataset, verify_transform_intent
 quality_tools.py   — run_quality_checks, detect_anomalies,
                      explain_anomalies, write_quality_report
 catalogue_tools.py — write_catalogue_entry, generate_lineage_graph,
-                     generate_dbt_model, read_catalogue
+                     generate_dbt_model, read_catalogue, generate_dbt_tests
 library_tools.py   — search_transform_library, save_to_library,
                      generate_dbt_schema_yml
 domain_tools.py    — detect_domain, load_domain_rules
 ```
+
+**Total: 25 tools across 7 modules.**
 
 ---
 
@@ -85,15 +87,16 @@ handles error cases in its ReAct loop — it should not crash because a
 tool threw an exception.
 
 **LLM calls inside tools:** Only these tools make LLM calls:
-- `generate_transform_code` — generates Python transformation script
-- `refine_transform_code` — revises code based on NLP instruction
-- `detect_domain` — classifies dataset domain when heuristics are
-  ambiguous
-- `explain_anomalies` — generates plain English anomaly explanation
-- `write_catalogue_entry` — generates column descriptions
-- `generate_lineage_graph` — maps output columns to source columns
-- `generate_dbt_model` — translates transformations to SQL
+- `generate_transform_code` — generates Python transformation script (Sonnet)
+- `refine_transform_code` — revises code based on NLP instruction (Sonnet)
+- `verify_transform_intent` — semantic check of 5-row before/after sample (**Haiku**)
+- `detect_domain` — classifies dataset domain when heuristics are ambiguous (**Haiku**)
+- `explain_anomalies` — generates plain English anomaly explanation (Sonnet)
+- `write_catalogue_entry` — generates column descriptions (Sonnet)
+- `generate_lineage_graph` — maps output columns to source columns (Sonnet)
+- `generate_dbt_model` — translates transformations to SQL (Sonnet)
 
+Use Haiku for narrow single-output tasks. Use Sonnet for generation tasks.
 No other tool makes LLM calls. If you find yourself adding an LLM call
 to a profiling or quality tool, stop — that logic belongs in the agent's
 ReAct reasoning, not in the tool.
@@ -236,21 +239,51 @@ review before including in revenue aggregations."
 
 ---
 
-## Registering tools in server.py
+## Adding a new tool
+
+1. Implement the function in the correct module (domain owns the file).
+2. Add it to that module's `TOOLS` dict at the bottom of the file.
+3. Add a `Tool(...)` entry to `TOOL_DEFINITIONS` in `server.py`.
+4. Done — `TOOL_HANDLERS` is built automatically by merging all `TOOLS` dicts.
+
+Never add the function to `TOOL_HANDLERS` directly.
+
+## TOOLS registry pattern (mandatory)
+
+Every tool module exports a `TOOLS` dict at the bottom:
+
+```python
+# bottom of transform_tools.py
+TOOLS: dict = {
+    "generate_transform_code": generate_transform_code,
+    "refine_transform_code":   refine_transform_code,
+    "execute_code":            execute_code,
+    "write_dataset":           write_dataset,
+    "verify_transform_intent": verify_transform_intent,
+}
+```
+
+`server.py` merges all seven dicts — never list functions individually:
 
 ```python
 # mcp_server/server.py
-from mcp.server import Server
-from mcp.server.sse import SseServerTransport
+from mcp_server.tools.source_tools    import TOOLS as _source_tools
+from mcp_server.tools.profiling_tools import TOOLS as _profiling_tools
+from mcp_server.tools.domain_tools    import TOOLS as _domain_tools
+from mcp_server.tools.transform_tools import TOOLS as _transform_tools
+from mcp_server.tools.quality_tools   import TOOLS as _quality_tools
+from mcp_server.tools.library_tools   import TOOLS as _library_tools
+from mcp_server.tools.catalogue_tools import TOOLS as _catalogue_tools
 
-from tools.source_tools import connect_csv, connect_postgres, connect_api, detect_new_rows
-from tools.profiling_tools import sample_data, compute_profile, detect_schema, compare_schemas
-from tools.transform_tools import generate_transform_code, refine_transform_code, execute_code, write_dataset
-from tools.quality_tools import run_quality_checks, detect_anomalies, explain_anomalies, write_quality_report
-from tools.catalogue_tools import write_catalogue_entry, generate_lineage_graph, generate_dbt_model, read_catalogue
-from tools.library_tools import search_transform_library, save_to_library, generate_dbt_schema_yml
-from tools.domain_tools import detect_domain, load_domain_rules
-
-# Server must respond to tool/list with all 23 tools on connect
+TOOL_HANDLERS: dict = {
+    **_source_tools,
+    **_profiling_tools,
+    **_domain_tools,
+    **_transform_tools,
+    **_quality_tools,
+    **_library_tools,
+    **_catalogue_tools,
+}
+# Total: 25 tools. Server must respond to tool/list with all 25.
 # Transport: SSE on port 8000
 ```

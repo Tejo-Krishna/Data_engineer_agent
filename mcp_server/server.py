@@ -23,46 +23,13 @@ import json
 # Import all tool functions
 # ---------------------------------------------------------------------------
 
-from mcp_server.tools.source_tools import (
-    connect_csv,
-    connect_postgres,
-    connect_api,
-    detect_new_rows,
-)
-from mcp_server.tools.profiling_tools import (
-    sample_data,
-    compute_profile,
-    detect_schema,
-    compare_schemas,
-)
-from mcp_server.tools.domain_tools import (
-    detect_domain,
-    load_domain_rules,
-)
-from mcp_server.tools.transform_tools import (
-    generate_transform_code,
-    refine_transform_code,
-    execute_code,
-    write_dataset,
-)
-from mcp_server.tools.quality_tools import (
-    run_quality_checks,
-    detect_anomalies,
-    explain_anomalies,
-    write_quality_report,
-)
-from mcp_server.tools.library_tools import (
-    search_transform_library,
-    save_to_library,
-    generate_dbt_schema_yml,
-)
-from mcp_server.tools.catalogue_tools import (
-    write_catalogue_entry,
-    generate_lineage_graph,
-    generate_dbt_model,
-    read_catalogue,
-    generate_dbt_tests,
-)
+from mcp_server.tools.source_tools import TOOLS as _source_tools
+from mcp_server.tools.profiling_tools import TOOLS as _profiling_tools
+from mcp_server.tools.domain_tools import TOOLS as _domain_tools
+from mcp_server.tools.transform_tools import TOOLS as _transform_tools
+from mcp_server.tools.quality_tools import TOOLS as _quality_tools
+from mcp_server.tools.library_tools import TOOLS as _library_tools
+from mcp_server.tools.catalogue_tools import TOOLS as _catalogue_tools
 
 # ---------------------------------------------------------------------------
 # Tool registry
@@ -256,6 +223,7 @@ TOOL_DEFINITIONS = [
                 "domain_context": {"type": "object"},
                 "library_snippets": {"type": ["array", "null"]},
                 "failure_reason": {"type": ["string", "null"]},
+                "large_file": {"type": "boolean", "default": False},
             },
             "required": ["user_goal", "profile", "schema", "domain_context"],
         },
@@ -314,6 +282,25 @@ TOOL_DEFINITIONS = [
                 "run_id": {"type": "string"},
             },
             "required": ["data_path", "output_name", "run_id"],
+        },
+    ),
+    Tool(
+        name="verify_transform_intent",
+        description=(
+            "Verify that the executed transformation semantically matches the user's goal. "
+            "Use when: execute_code succeeded and you need lightweight semantic confirmation. "
+            "Do NOT use when: execute_code failed — only verify successful outputs. "
+            "Returns: intent_matched (bool), confidence (float 0-1), issues (list[str])."
+        ),
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "user_goal": {"type": "string"},
+                "input_path": {"type": "string"},
+                "output_path": {"type": "string"},
+                "transformations_applied": {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["user_goal", "input_path", "output_path", "transformations_applied"],
         },
     ),
     # Quality tools
@@ -567,33 +554,15 @@ TOOL_DEFINITIONS = [
 # Tool dispatch map
 # ---------------------------------------------------------------------------
 
-TOOL_HANDLERS = {
-    "connect_csv": connect_csv,
-    "connect_postgres": connect_postgres,
-    "connect_api": connect_api,
-    "detect_new_rows": detect_new_rows,
-    "sample_data": sample_data,
-    "compute_profile": compute_profile,
-    "detect_schema": detect_schema,
-    "compare_schemas": compare_schemas,
-    "detect_domain": detect_domain,
-    "load_domain_rules": load_domain_rules,
-    "generate_transform_code": generate_transform_code,
-    "refine_transform_code": refine_transform_code,
-    "execute_code": execute_code,
-    "write_dataset": write_dataset,
-    "run_quality_checks": run_quality_checks,
-    "detect_anomalies": detect_anomalies,
-    "explain_anomalies": explain_anomalies,
-    "write_quality_report": write_quality_report,
-    "search_transform_library": search_transform_library,
-    "save_to_library": save_to_library,
-    "generate_dbt_schema_yml": generate_dbt_schema_yml,
-    "write_catalogue_entry": write_catalogue_entry,
-    "generate_lineage_graph": generate_lineage_graph,
-    "generate_dbt_model": generate_dbt_model,
-    "read_catalogue": read_catalogue,
-    "generate_dbt_tests": generate_dbt_tests,
+# Built dynamically from each module's TOOLS dict — add new tools there, not here.
+TOOL_HANDLERS: dict = {
+    **_source_tools,
+    **_profiling_tools,
+    **_domain_tools,
+    **_transform_tools,
+    **_quality_tools,
+    **_library_tools,
+    **_catalogue_tools,
 }
 
 

@@ -21,7 +21,7 @@ from pathlib import Path
 
 from langgraph.types import RunnableConfig
 
-from orchestrator.state import PipelineState
+from orchestrator.state import PipelineState, require_quality_output
 
 
 async def run_catalogue_agent(
@@ -33,6 +33,7 @@ async def run_catalogue_agent(
             f"Catalogue agent must only run after a successful pipeline. "
             f"Current status: {state.get('status')!r}"
         )
+    require_quality_output(state)
 
     mcp = config["configurable"]["mcp"]
     logger = config["configurable"]["logger"]

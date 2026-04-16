@@ -149,7 +149,9 @@ async def _llm_classify(
     user_goal: str,
 ) -> dict:
     client = anthropic.AsyncAnthropic()
-    model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+    # Haiku is sufficient for a 6-way classification with ~10 column names —
+    # saves ~10x vs Sonnet with no quality difference for this narrow task.
+    model = os.getenv("DOMAIN_CLASSIFY_MODEL", "claude-haiku-4-5-20251001")
 
     # Format sample values for the prompt (up to 3 per column)
     sample_preview = {
@@ -235,3 +237,13 @@ def _empty_rules(domain: str) -> dict:
         "default_watermark_column": None,
         "detection_keywords": [],
     }
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "detect_domain": detect_domain,
+    "load_domain_rules": load_domain_rules,
+}

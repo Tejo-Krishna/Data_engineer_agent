@@ -4,11 +4,22 @@ Sandboxed Python subprocess executor.
 Runs generated transformation code in a clean subprocess with only
 INPUT_PATH, OUTPUT_PATH, and PATH in the environment.
 
+Docker mode (3.1):
+  Set DOCKER_SANDBOX_IMAGE to a Docker image that has pandas + pyarrow
+  installed (e.g. "data-agent-sandbox:latest"). When set, execution uses
+  `docker run --rm --network none` for full network/filesystem isolation.
+  Falls back to subprocess automatically if the image is unavailable.
+
+Subprocess fallback:
+  Used when DOCKER_SANDBOX_IMAGE is unset or Docker is unavailable.
+  Clean env, /tmp cwd — same contract as Docker mode.
+
 Never call this with database credentials, API keys, or any secrets.
 The calling code is responsible for constructing input/output paths.
 """
 
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -45,22 +56,119 @@ def run_sandboxed(
             execution_time_ms: int,
         }
     """
-    tmp_script: str | None = None
+    docker_image = os.getenv("DOCKER_SANDBOX_IMAGE", "").strip()
+    if docker_image and shutil.which("docker"):
+        return _run_docker(code, input_path, output_path, timeout, docker_image)
+    return _run_subprocess(code, input_path, output_path, timeout)
 
+
+# ---------------------------------------------------------------------------
+# Docker execution path
+# ---------------------------------------------------------------------------
+
+def _run_docker(
+    code: str,
+    input_path: str,
+    output_path: str,
+    timeout: int,
+    image: str,
+) -> dict:
+    """
+    Execute in a Docker container with --network none for full isolation.
+
+    Mount strategy:
+      - input file is mounted read-only at /data/input/<filename>
+      - output directory is mounted read-write at /data/output/
+      - a tmpfs at /tmp for the script itself
+
+    The generated code sees:
+      INPUT_PATH  = /data/input/<filename>
+      OUTPUT_PATH = /data/output/out.parquet
+    """
+    input_path = str(Path(input_path).resolve())
+    input_filename = Path(input_path).name
+    output_dir = str(Path(output_path).parent.resolve())
+
+    tmp_script: str | None = None
     try:
-        # Write code to a temp file in /tmp
+        # Write script to a temp file that we can mount into the container
         with tempfile.NamedTemporaryFile(
-            mode="w",
-            suffix=".py",
-            prefix="sandbox_",
-            dir="/tmp",
-            delete=False,
-            encoding="utf-8",
+            mode="w", suffix=".py", prefix="sandbox_", dir="/tmp",
+            delete=False, encoding="utf-8",
         ) as f:
             f.write(code)
             tmp_script = f.name
 
-        # Clean environment — only what the script is allowed to see
+        cmd = [
+            "docker", "run", "--rm",
+            "--network", "none",
+            "--memory", "512m",
+            "--cpus", "1",
+            # Mount input file read-only
+            "--volume", f"{input_path}:/data/input/{input_filename}:ro",
+            # Mount output dir read-write
+            "--volume", f"{output_dir}:/data/output:rw",
+            # Mount the script read-only
+            "--volume", f"{tmp_script}:/sandbox/script.py:ro",
+            # Env vars the script sees
+            "--env", f"INPUT_PATH=/data/input/{input_filename}",
+            "--env", f"OUTPUT_PATH=/data/output/{Path(output_path).name}",
+            "--env", "PATH=/usr/local/bin:/usr/bin:/bin",
+            "--workdir", "/tmp",
+            image,
+            "python", "/sandbox/script.py",
+        ]
+
+        start = time.monotonic()
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return _timeout_result(timeout)
+
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+
+        return _build_result(result.returncode, result.stdout, result.stderr, elapsed_ms)
+
+    except Exception as exc:
+        # Docker unavailable or misconfigured — fall back to subprocess
+        return _run_subprocess(code, input_path, output_path, timeout)
+
+    finally:
+        if tmp_script and Path(tmp_script).exists():
+            try:
+                Path(tmp_script).unlink()
+            except OSError:
+                pass
+
+
+# ---------------------------------------------------------------------------
+# Subprocess execution path (fallback)
+# ---------------------------------------------------------------------------
+
+def _run_subprocess(
+    code: str,
+    input_path: str,
+    output_path: str,
+    timeout: int,
+) -> dict:
+    """
+    Execute in a clean subprocess. No network restriction, but env is wiped
+    to only INPUT_PATH, OUTPUT_PATH, and PATH.
+    """
+    tmp_script: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".py", prefix="sandbox_", dir="/tmp",
+            delete=False, encoding="utf-8",
+        ) as f:
+            f.write(code)
+            tmp_script = f.name
+
         clean_env = {
             "INPUT_PATH": input_path,
             "OUTPUT_PATH": output_path,
@@ -68,41 +176,20 @@ def run_sandboxed(
         }
 
         start = time.monotonic()
-        result = subprocess.run(
-            [sys.executable, tmp_script],
-            capture_output=True,
-            text=True,
-            cwd="/tmp",
-            env=clean_env,
-            timeout=timeout,
-        )
+        try:
+            result = subprocess.run(
+                [sys.executable, tmp_script],
+                capture_output=True,
+                text=True,
+                cwd="/tmp",
+                env=clean_env,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return _timeout_result(timeout)
+
         elapsed_ms = int((time.monotonic() - start) * 1000)
-
-        success = result.returncode == 0
-        stdout = result.stdout or ""
-        stderr = result.stderr or ""
-
-        rows_input = _parse_rows(stdout, "ROWS_IN")
-        rows_output = _parse_rows(stdout, "ROWS_OUT")
-
-        return {
-            "success": success,
-            "stdout": stdout,
-            "stderr": stderr,
-            "rows_input": rows_input,
-            "rows_output": rows_output,
-            "execution_time_ms": elapsed_ms,
-        }
-
-    except subprocess.TimeoutExpired:
-        return {
-            "success": False,
-            "stdout": "",
-            "stderr": f"Execution timed out after {timeout} seconds.",
-            "rows_input": None,
-            "rows_output": None,
-            "execution_time_ms": timeout * 1000,
-        }
+        return _build_result(result.returncode, result.stdout, result.stderr, elapsed_ms)
 
     except Exception as exc:
         return {
@@ -120,6 +207,33 @@ def run_sandboxed(
                 Path(tmp_script).unlink()
             except OSError:
                 pass
+
+
+# ---------------------------------------------------------------------------
+# Shared helpers
+# ---------------------------------------------------------------------------
+
+def _build_result(returncode: int, stdout: str, stderr: str, elapsed_ms: int) -> dict:
+    success = returncode == 0
+    return {
+        "success": success,
+        "stdout": stdout or "",
+        "stderr": stderr or "",
+        "rows_input": _parse_rows(stdout, "ROWS_IN"),
+        "rows_output": _parse_rows(stdout, "ROWS_OUT"),
+        "execution_time_ms": elapsed_ms,
+    }
+
+
+def _timeout_result(timeout: int) -> dict:
+    return {
+        "success": False,
+        "stdout": "",
+        "stderr": f"Execution timed out after {timeout} seconds.",
+        "rows_input": None,
+        "rows_output": None,
+        "execution_time_ms": timeout * 1000,
+    }
 
 
 def _parse_rows(stdout: str, marker: str) -> int | None:

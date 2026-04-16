@@ -116,6 +116,7 @@ async def test_full_pipeline_success():
             source_type="csv",
             user_goal="clean dates, dedup, convert GBP to USD",
             incremental=False,
+            force=True,
         )
         return result
 
@@ -214,6 +215,7 @@ async def test_pipeline_domain_detection():
             source_type="csv",
             user_goal="clean and normalise sales data",
             incremental=False,
+            force=True,
         )
     )
 
@@ -265,6 +267,7 @@ async def test_pipeline_schema_drift_none_on_second_run():
                 source_type="csv",
                 user_goal="clean dates and dedup",
                 incremental=False,
+                force=True,
             )
         )
 

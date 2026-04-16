@@ -13,7 +13,7 @@ import os
 
 import anthropic
 
-_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5")
+_MODEL = lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
 
 
 def _mcp_to_anthropic(tool: dict) -> dict:
@@ -34,12 +34,16 @@ async def call_llm_with_tools(
     available_tools: list[str],
     mcp_tools: list[dict],
     max_tokens: int = 4096,
+    system_prompt: str | None = None,
 ):
     """
     Call the Anthropic API with a filtered set of tools.
 
     available_tools: names of tools the agent is allowed to call this turn.
     mcp_tools: full tool list from mcp.list_tools() — filtered here by name.
+    system_prompt: static agent system prompt. When provided, it is sent with
+        cache_control so the stable prefix (system + tool definitions) is cached
+        across all ReAct loop turns within the same agent run (5-min TTL).
 
     Returns the raw Anthropic Message object. Callers check
     response.stop_reason and use extract_tool_calls(response).
@@ -50,13 +54,29 @@ async def call_llm_with_tools(
         for t in mcp_tools
         if t["name"] in available_tools
     ]
-    return await client.messages.create(
+
+    # Mark the last tool definition as the end of the cacheable prefix.
+    # The cache covers: system prompt + all tool definitions. Turns 2+ in the
+    # ReAct loop hit the cache because this prefix is identical each turn.
+    if tools:
+        tools[-1] = {**tools[-1], "cache_control": {"type": "ephemeral"}}
+
+    kwargs: dict = dict(
         model=_MODEL(),
         max_tokens=max_tokens,
         tools=tools,
         messages=messages,
         timeout=120.0,
     )
+    if system_prompt:
+        kwargs["system"] = [
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ]
+    return await client.messages.create(**kwargs)
 
 
 def extract_tool_calls(response) -> list[dict]:
@@ -98,6 +118,32 @@ def tool_result_message(tool_use_id: str, result: dict) -> dict:
             }
         ],
     }
+
+
+def trim_messages(
+    messages: list[dict],
+    keep_first: int = 1,
+    keep_last: int = 10,
+) -> list[dict]:
+    """
+    Trim a ReAct message list to prevent context window overflow.
+
+    Keeps the first `keep_first` messages (the initial user context/goal, which
+    the LLM must always see) and the last `keep_last` messages (the most recent
+    tool calls and results). Middle turns are dropped.
+
+    Call this at the top of each ReAct loop iteration if len(messages) is large:
+
+        messages = trim_messages(messages)
+        response = await call_llm_with_tools(messages, ...)
+
+    The default of keep_first=1, keep_last=10 retains ~5 full tool-call rounds
+    without growing the prompt past ~8K tokens in typical use.
+    """
+    total = keep_first + keep_last
+    if len(messages) <= total:
+        return messages
+    return messages[:keep_first] + messages[-keep_last:]
 
 
 def build_tool_results_message(results: list[tuple[str, dict]]) -> dict:

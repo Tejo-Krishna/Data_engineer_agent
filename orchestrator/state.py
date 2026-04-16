@@ -9,11 +9,57 @@ from typing import Optional, Literal
 from typing_extensions import TypedDict
 
 
+class StateBoundaryError(ValueError):
+    """Raised when an agent is entered without required upstream fields."""
+
+
+def require_profiler_output(state: "PipelineState") -> None:
+    """Call at the start of domain agent — fails fast if profiler fields missing.
+    Checks only profile and schema — the two fields domain agent actually reads.
+    sample is produced by the profiler but is not consumed by domain detection.
+    """
+    missing = [f for f in ("profile", "schema") if not state.get(f)]
+    if missing:
+        raise StateBoundaryError(
+            f"Domain agent requires profiler output. Missing fields: {missing}"
+        )
+
+
+def require_domain_output(state: "PipelineState") -> None:
+    """Call at the start of transformer agent — fails fast if domain fields missing."""
+    if not state.get("domain_context"):
+        raise StateBoundaryError(
+            "Transformer agent requires domain_context. Run domain agent first."
+        )
+
+
+def require_transformer_output(state: "PipelineState") -> None:
+    """Call at the start of quality agent — fails fast if transformer fields missing.
+    Checks output_path only — what quality agent actually reads.
+    generated_code is always set alongside output_path in real runs but is not
+    read by the quality agent itself.
+    """
+    if not state.get("output_path"):
+        raise StateBoundaryError(
+            "Quality agent requires output_path from transformer. "
+            "Run transformer agent first."
+        )
+
+
+def require_quality_output(state: "PipelineState") -> None:
+    """Call at the start of catalogue agent — fails fast if quality fields missing."""
+    if state.get("quality_passed") is None:
+        raise StateBoundaryError(
+            "Catalogue agent requires quality_passed from quality agent."
+        )
+
+
 class PipelineState(TypedDict):
     # ------------------------------------------------------------------
     # Input — set by main.py before the graph is invoked
     # ------------------------------------------------------------------
     run_id: str
+    run_key: Optional[str]             # content-hash for idempotency checks
     user_goal: str
     source_path: str
     source_type: Literal["csv", "parquet", "postgres", "api"]
@@ -40,6 +86,7 @@ class PipelineState(TypedDict):
     # ------------------------------------------------------------------
     # Transformer output
     # ------------------------------------------------------------------
+    large_file: Optional[bool]             # True when source > LARGE_FILE_THRESHOLD_MB
     library_snippets: Optional[list]
     watermark_value: Optional[str]        # incremental high-water mark
     generated_code: Optional[str]
@@ -80,4 +127,4 @@ class PipelineState(TypedDict):
     # ------------------------------------------------------------------
     # Final
     # ------------------------------------------------------------------
-    status: Literal["running", "success", "failed", "retrying"]
+    status: Literal["running", "success", "failed", "retrying", "catalogue_pending"]

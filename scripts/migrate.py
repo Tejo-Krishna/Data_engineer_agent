@@ -75,6 +75,7 @@ TABLES = {
     "pipeline_runs": """
         CREATE TABLE IF NOT EXISTS pipeline_runs (
             id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            run_key           VARCHAR(64),
             user_goal         TEXT,
             source_path       TEXT,
             source_type       TEXT,
@@ -159,6 +160,13 @@ INDEXES = {
         USING ivfflat (embedding vector_cosine_ops)
         WITH (lists = 100);
     """,
+
+    # Idempotency index — fast lookup of successful runs by content key
+    "pipeline_runs_run_key_idx": """
+        CREATE INDEX IF NOT EXISTS pipeline_runs_run_key_idx
+        ON pipeline_runs (run_key)
+        WHERE run_key IS NOT NULL;
+    """,
 }
 
 
@@ -178,6 +186,14 @@ async def run_migrations() -> None:
         for table_name, ddl in TABLES.items():
             await conn.execute(ddl)
             print(f"✓ table '{table_name}' ready")
+
+        # Additive column migrations — safe to run against existing tables
+        additive_migrations = [
+            # Gap 2: idempotency key — added after initial schema
+            "ALTER TABLE pipeline_runs ADD COLUMN IF NOT EXISTS run_key VARCHAR(64);",
+        ]
+        for ddl in additive_migrations:
+            await conn.execute(ddl)
 
         # Create indexes — must come after tables exist
         for index_name, ddl in INDEXES.items():

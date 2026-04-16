@@ -1,209 +1,147 @@
 # Data Engineering Multi-Agent System
 
-A fully autonomous data engineering pipeline powered by five AI agents. Describe your data transformation goal in plain English — the system profiles your data, detects its domain, transforms it, validates quality, and delivers five production-ready outputs.
+A multi-agent ETL pipeline where you describe a data transformation goal in plain English and five AI agents collaborate to produce cleaned data, a quality report, column lineage, and dbt models — all locally, with no data leaving your machine.
 
 ## What it does
 
 You provide:
-- A **data source** — CSV/Parquet file, PostgreSQL connection string, or REST API URL
-- A **processing mode** — `full` (reprocess everything) or `incremental` (only new rows since last run)
-- A **natural language goal** — e.g. `"clean dates, dedup, convert GBP to USD"`
+- A data source (CSV/Parquet file, Postgres table, or REST API)
+- A processing mode (`full` or `incremental`)
+- A natural language goal: `"clean dates, dedup, convert GBP to USD"`
 
-The system produces, per successful run:
-
-| Output | Description |
-|--------|-------------|
-| Cleaned Parquet file | Transformed dataset ready for downstream use |
-| Pipeline script | Rerunnable Python script, schedulable as a cron job |
-| Quality report | JSON + Markdown report with anomaly explanations |
-| Catalogue entry | Column-level lineage stored in pgvector |
-| dbt artefacts | SQL model + `schema.yml` + `schema_tests.yml` |
-
----
+You get back (per successful run):
+1. Cleaned Parquet file at `outputs/{run_id}/transformed.parquet`
+2. Rerunnable `pipeline.py` script (schedulable as a cron job)
+3. Quality report — `quality_report.json` + `quality_report.md`
+4. Catalogue entry with column-level lineage stored in pgvector
+5. dbt SQL model + `schema.yml` + `schema_tests.yml`
 
 ## Architecture
-
-Five agents run in sequence, connected by a LangGraph orchestration layer:
 
 ```
 Profiler → [drift checkpoint] → Domain → Transformer → Quality → Catalogue
                                               ↑              |
-                                              └─── retry ────┘  (max 3)
+                                              └── retry ─────┘ (max 3)
 ```
 
-| Agent | Role |
-|-------|------|
-| **Profiler** | Connects to source, samples 2 000 rows, detects schema drift, computes statistical profile |
-| **Domain** | Classifies data domain (medical, financial, retail, automotive, employment) using keyword heuristics + LLM fallback; loads domain-specific validation rules |
-| **Transformer** | ReAct loop — searches transform library, generates Python code via LLM, awaits human-in-the-loop approval, executes in sandbox |
-| **Quality** | Runs targeted quality checks, detects anomalies, produces plain-English explanations via LLM |
-| **Catalogue** | Writes catalogue entry, generates Mermaid lineage graph, produces dbt model + tests |
+### Five agents
 
-### MCP Server — 23 tools across 7 domains
+| Agent | Type | What it does |
+|-------|------|--------------|
+| Profiler | Fixed 5-call sequence | Connects, samples, detects drift, profiles, infers schema |
+| Domain | Fixed 2-call sequence | Classifies domain (retail/medical/financial/…), loads YAML rules |
+| Transformer | ReAct loop (max 6 calls) | Generates Python transformation code, runs HITL checkpoint, executes in sandbox, verifies intent |
+| Quality | ReAct loop (max 6 calls) | Runs quality checks, detects anomalies, explains them, writes report |
+| Catalogue | Fixed 5-call sequence | Writes catalogue entry, generates lineage graph, produces dbt artefacts |
 
-The agents communicate exclusively through an MCP (Model Context Protocol) server running locally on port 8000. Tools are grouped into:
+### MCP server — 25 tools
 
-`source` · `profiling` · `transform` · `quality` · `catalogue` · `library` · `domain`
+All agent-to-tool communication goes through a local MCP server (FastAPI + SSE, port 8000).
+
+| Domain | Tools |
+|--------|-------|
+| source (4) | connect_csv, connect_postgres, connect_api, detect_new_rows |
+| profiling (4) | sample_data, compute_profile, detect_schema, compare_schemas |
+| transform (5) | generate_transform_code, refine_transform_code, execute_code, write_dataset, verify_transform_intent |
+| quality (4) | run_quality_checks, detect_anomalies, explain_anomalies, write_quality_report |
+| catalogue (5) | write_catalogue_entry, generate_lineage_graph, generate_dbt_model, read_catalogue, generate_dbt_tests |
+| library (3) | search_transform_library, save_to_library, generate_dbt_schema_yml |
+| domain (2) | detect_domain, load_domain_rules |
 
 ### Infrastructure (all local Docker)
 
-| Service | Purpose | Port |
-|---------|---------|------|
-| PostgreSQL 16 + pgvector | Catalogue, transform library, pipeline runs, lineage | 5432 |
-| Redis | HITL checkpoint state, watermark high-water marks | 6379 |
-| Langfuse (self-hosted) | Full observability dashboard | 3000 |
-| MCP Server (FastAPI) | Tool execution layer for agents | 8000 |
+- **PostgreSQL 16 + pgvector** — catalogue, transform library, pipeline runs, quality results, lineage
+- **Redis** — HITL checkpoint state, incremental watermark high-water marks
+- **Langfuse** (self-hosted at `localhost:3000`) — every agent start/end and tool call logged
+- **DuckDB** — in-process profiling and Parquet I/O (no network calls)
 
-Only outbound traffic: Anthropic API calls. No data leaves your machine.
-
----
+Only outbound traffic: Anthropic API calls. Nothing else leaves your machine.
 
 ## Quick start
 
-### 1. Prerequisites
-
-- Docker and Docker Compose
-- Python 3.11+
-- An Anthropic API key
-- An OpenAI API key (embeddings only)
-
-### 2. Clone and configure
-
 ```bash
-git clone https://github.com/<your-username>/data-agent.git
-cd data-agent
-cp .env.example .env
-# Edit .env and fill in ANTHROPIC_API_KEY and OPENAI_API_KEY
-```
-
-### 3. Start infrastructure
-
-```bash
-docker compose up -d
-```
-
-Wait ~30 seconds for all services to become healthy, then visit [http://localhost:3000](http://localhost:3000) to set up Langfuse. Create an account, create a project, and copy the public/secret keys into `.env` as `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY`.
-
-### 4. Set up the database and seed the transform library
-
-```bash
+# 1. Clone and set up Python environment
+git clone https://github.com/Tejo-Krishna/Data_engineer_agent
+cd data_agent
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env — set ANTHROPIC_API_KEY at minimum
+
+# 3. Start infrastructure
+docker-compose up -d postgres redis langfuse
+
+# 4. Run database migrations
 python scripts/migrate.py
+
+# 5. Seed the transform library with common patterns
 python scripts/seed_library.py
-```
 
-### 5. Run the pipeline
+# 6. Start the MCP server
+uvicorn mcp_server.server:app --port 8000
 
-```bash
-# Full run on the included sample CSV
+# 7. Run the pipeline
 python main.py \
   --source sample_data/sales_raw.csv \
-  --type csv \
-  --goal "clean dates, deduplicate rows, convert GBP to USD"
-
-# Incremental run — only processes rows added since the last run
-python main.py \
-  --source sample_data/sales_raw.csv \
-  --type csv \
-  --goal "clean dates, deduplicate rows, convert GBP to USD" \
-  --incremental
-
-# PostgreSQL source
-python main.py \
-  --source "postgresql://user:pass@localhost:5432/mydb::orders" \
-  --type postgres \
-  --goal "normalise phone numbers and title-case names"
-
-# REST API source
-python main.py \
-  --source "https://api.example.com/sales" \
-  --type api \
-  --goal "filter active records and standardise country codes"
+  --goal "clean dates and remove duplicates" \
+  --mode full
 ```
 
-### Human-in-the-loop (HITL)
+## Environment variables
 
-At two points the pipeline pauses and waits for your input (default timeout: 10 minutes):
-
-1. **Schema drift checkpoint** — if the incoming schema has changed since the last run
-2. **Transform approval** — review and approve (or edit) the generated transformation code before it executes
-
-You can approve, provide a natural-language edit instruction, or reject. On retry runs the checkpoint is skipped automatically.
-
----
-
-## Project structure
-
-```
-data-agent/
-├── agents/              # Five agent implementations
-├── mcp_server/
-│   ├── server.py        # FastAPI + MCP server; registers all 23 tools
-│   └── tools/           # Tool implementations (7 modules)
-├── orchestrator/
-│   ├── graph.py         # LangGraph graph definition
-│   ├── router.py        # Routing logic (retry, drift, HITL)
-│   └── state.py         # PipelineState TypedDict
-├── domain_rules/        # YAML validation rules per domain
-├── sandbox/             # Sandboxed Python code executor
-├── hitl/                # HITL checkpoint server + Redis state
-├── observability/       # Langfuse tracing wrappers
-├── memory/              # Transform library + catalogue store
-├── scripts/             # DB migration and library seeding
-├── tests/               # Unit and integration tests
-├── sample_data/         # sales_raw.csv (500 rows, with quality issues)
-├── outputs/             # Pipeline-generated files (gitignored)
-├── docker-compose.yml
-├── requirements.txt
-└── main.py              # CLI entry point
-```
-
----
-
-## Domain rules
-
-The system ships with validation rules for five domains. Rules take precedence over user instructions — e.g. if `medical.yaml` forbids dropping null rows, the transformer will not generate code that drops them even if asked.
-
-| Domain | File |
-|--------|------|
-| Medical | `domain_rules/medical.yaml` |
-| Financial | `domain_rules/financial.yaml` |
-| Retail | `domain_rules/retail.yaml` |
-| Automotive | `domain_rules/automotive.yaml` |
-| Employment | `domain_rules/employment.yaml` |
-
----
-
-## Observability
-
-Every agent call, every tool invocation, and every retry is traced to Langfuse. Open [http://localhost:3000](http://localhost:3000) after a run to see the full execution trace, token usage, and latency breakdown.
-
----
-
-## Configuration
-
-All configuration lives in `.env`. Key variables:
-
-| Variable | Description |
-|----------|-------------|
-| `ANTHROPIC_API_KEY` | Used for all LLM reasoning calls |
-| `OPENAI_API_KEY` | Used for embeddings only (`text-embedding-3-small`) |
-| `ANTHROPIC_MODEL` | Model ID (default: `claude-sonnet-4-5`) |
-| `MAX_QUALITY_RETRIES` | Max transformer retries on quality failure (default: 3) |
-| `SANDBOX_TIMEOUT_SECONDS` | Timeout for sandboxed code execution (default: 30) |
-| `SAMPLE_SIZE` | Rows sampled for profiling (default: 2000) |
-| `HITL_TIMEOUT_SECONDS` | Time to wait for human approval (default: 600) |
-
----
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `ANTHROPIC_API_KEY` | Yes | — | Anthropic API key |
+| `ANTHROPIC_MODEL` | No | `claude-sonnet-4-5` | Model for code generation tasks |
+| `DOMAIN_CLASSIFY_MODEL` | No | `claude-haiku-4-5-20251001` | Model for domain classification |
+| `DOCKER_SANDBOX_IMAGE` | No | (unset) | Docker image for isolated sandbox execution. Falls back to subprocess when unset. |
+| `DATABASE_URL` | Yes | — | Postgres connection string |
+| `REDIS_URL` | No | `redis://localhost:6379` | Redis connection string |
+| `OUTPUT_DIR` | No | `outputs/` | Base directory for run outputs |
+| `DOMAIN_RULES_DIR` | No | `domain_rules/` | Path to domain YAML rule files |
 
 ## Running tests
 
 ```bash
+# All tests (77 total, ~3 seconds, no API calls required)
 pytest tests/ -v
+
+# Just the architectural improvement tests
+pytest tests/test_improvements.py -v
+
+# Tool-level unit tests
+pytest tests/test_tools.py -v
+
+# Agent integration tests (mocked LLM)
+pytest tests/test_agents.py -v
 ```
 
----
+## Repository layout
 
-## License
+```
+data_agent/
+├── .claude/             — CLAUDE.md master prompt + skill files for AI-assisted dev
+├── agents/              — Five agent implementations
+├── mcp_server/
+│   ├── server.py        — FastAPI + MCP SSE server, TOOL_HANDLERS registry
+│   └── tools/           — 25 tools in 7 domain-scoped modules
+├── orchestrator/
+│   ├── state.py         — PipelineState TypedDict + boundary validators
+│   ├── graph.py         — LangGraph pipeline graph
+│   └── router.py        — Status-based routing logic
+├── sandbox/
+│   └── executor.py      — Sandboxed runner (Docker mode + subprocess fallback)
+├── domain_rules/        — YAML constraint files per domain
+├── hitl/                — Human-in-the-loop checkpoint (Redis-backed polling)
+├── observability/       — Langfuse tracing wrappers
+├── scripts/             — migrate.py, seed_library.py
+├── tests/               — 77 unit + integration tests, no live API needed
+├── sample_data/         — sales_raw.csv for smoke testing
+└── outputs/             — Per-run output directory (gitignored)
+```
 
-MIT
+## Design rationale
+
+See [DESIGN.md](DESIGN.md) for the rationale behind each architectural decision.

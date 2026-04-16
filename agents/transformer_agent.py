@@ -32,6 +32,7 @@ from agents.utils import (
     call_llm_with_tools,
     build_tool_results_message,
     extract_tool_calls,
+    trim_messages,
 )
 from hitl.checkpoint import (
     hitl_code_checkpoint,
@@ -39,7 +40,7 @@ from hitl.checkpoint import (
     hitl_confirm_after_refinement,
 )
 from observability.tracing import log_hitl_nlp_instruction
-from orchestrator.state import PipelineState
+from orchestrator.state import PipelineState, require_domain_output
 
 
 TRANSFORMER_SYSTEM_PROMPT = """You are a data engineering code generator.
@@ -76,6 +77,8 @@ async def run_transformer_agent(
     state: PipelineState,
     config: RunnableConfig,
 ) -> PipelineState:
+    require_domain_output(state)
+
     mcp = config["configurable"]["mcp"]
     logger = config["configurable"]["logger"]
     span = logger.agent_start("transformer")
@@ -110,10 +113,50 @@ async def run_transformer_agent(
     output_path: str = ""
     hitl_approved: bool = False
 
+    # ------------------------------------------------------------------
+    # 3.3 Targeted repair — skip full regen when we have existing code
+    # ------------------------------------------------------------------
+    # On retry, try a cheap refine→execute path before falling back to the
+    # full generate_transform_code ReAct loop. This saves 2-3 LLM calls per
+    # retry (full Sonnet call + planning turn → single refine call).
+    if state["retry_count"] > 0 and generated_code and state.get("failure_reason"):
+        repair_result = await _try_targeted_repair(
+            generated_code=generated_code,
+            failure_reason=state["failure_reason"],
+            state=state,
+            mcp=mcp,
+            logger=logger,
+            span=span,
+        )
+        if repair_result is not None:
+            # Repair succeeded — return early without touching the ReAct loop
+            pipeline_script = _save_pipeline_script(run_id, repair_result["generated_code"])
+            logger.agent_end(span)
+            return {
+                **state,
+                "library_snippets": library_snippets,
+                "watermark_value": watermark_value,
+                "generated_code": repair_result["generated_code"],
+                "transformations_applied": transformations_applied,
+                "output_columns": output_columns,
+                "output_path": repair_result["output_path"],
+                "rows_input": repair_result["rows_input"],
+                "rows_output": repair_result["rows_output"],
+                "pipeline_script": pipeline_script,
+                "hitl_approved": True,
+                "status": "running",
+            }
+        # Repair failed — fall through to full ReAct loop with failure context
+
     tool_call_count = 0
 
     while tool_call_count < MAX_CALLS:
-        response = await call_llm_with_tools(messages, available, mcp_tools)
+        # Trim context each turn: keep initial goal + last 10 turns
+        messages = trim_messages(messages, keep_first=1, keep_last=10)
+        response = await call_llm_with_tools(
+            messages, available, mcp_tools,
+            system_prompt=TRANSFORMER_SYSTEM_PROMPT,
+        )
 
         if response.stop_reason == "end_turn":
             break
@@ -138,6 +181,7 @@ async def run_transformer_agent(
                     tc["input"]["library_snippets"] = library_snippets
                 tc["input"]["schema"] = state["schema"]
                 tc["input"]["profile"] = state["profile"]
+                tc["input"]["large_file"] = bool(state.get("large_file"))
             if tc["name"] == "write_dataset":
                 tc["input"]["run_id"] = run_id
             result = await mcp.call(tc["name"], tc["input"])
@@ -228,6 +272,52 @@ async def run_transformer_agent(
                     }
                 rows_input = result.get("rows_input", 0)
                 rows_output = result.get("rows_output", 0)
+
+                # 3.5 Semantic verification — Haiku, 5-row sample, ~$0.0001
+                exec_output_path = tc["input"].get("output_path", "")
+                if exec_output_path:
+                    print("  [transformer] semantic verification ...", flush=True)
+                    verify_result = await mcp.call("verify_transform_intent", {
+                        "user_goal": state["user_goal"],
+                        "input_path": _get_input_path(state),
+                        "output_path": exec_output_path,
+                        "transformations_applied": transformations_applied,
+                    })
+                    logger.tool_call(
+                        span, "transformer", "verify_transform_intent",
+                        {"goal_len": len(state["user_goal"])},
+                        {
+                            "matched": verify_result.get("intent_matched"),
+                            "confidence": verify_result.get("confidence"),
+                            "issues": len(verify_result.get("issues", [])),
+                        },
+                    )
+                    if not verify_result.get("intent_matched", True):
+                        issues = "; ".join(verify_result.get("issues", []))
+                        print(f"  [transformer] semantic mismatch: {issues}", flush=True)
+                        # Inject mismatch into messages so LLM knows to regenerate
+                        results_for_turn.append((tc["id"], result))
+                        messages.append(build_tool_results_message(results_for_turn))
+                        messages.append({
+                            "role": "user",
+                            "content": (
+                                f"Semantic verification FAILED (confidence={verify_result.get('confidence')}).\n"
+                                f"Issues: {issues}\n"
+                                "Call generate_transform_code again with these issues as the failure_reason."
+                            ),
+                        })
+                        logger.agent_end(span)
+                        return {
+                            **state,
+                            "status": "retrying",
+                            "failure_reason": f"Semantic mismatch: {issues}",
+                            "retry_count": state["retry_count"] + 1,
+                            "generated_code": generated_code,
+                            "transformations_applied": transformations_applied,
+                            "library_snippets": library_snippets,
+                            "watermark_value": watermark_value,
+                            "hitl_approved": hitl_approved,
+                        }
 
             if tc["name"] == "write_dataset":
                 output_path = result.get("output_path", "")
@@ -400,6 +490,7 @@ def _build_context(state: PipelineState) -> str:
         f"Source path: {state['source_path']}",
         f"Source type: {state['source_type']}",
         f"Incremental mode: {state.get('incremental_mode', False)}",
+        f"Large file mode: {bool(state.get('large_file'))} (DuckDB streaming required if True)",
         f"Schema{schema_note}: {json.dumps(schema_summary, indent=2)}",
     ]
 
@@ -446,6 +537,93 @@ def _save_pipeline_script(run_id: str, code: str) -> str:
     script_path = output_dir / "pipeline.py"
     script_path.write_text(code, encoding="utf-8")
     return str(script_path)
+
+
+async def _try_targeted_repair(
+    generated_code: str,
+    failure_reason: str,
+    state: PipelineState,
+    mcp,
+    logger,
+    span,
+) -> dict | None:
+    """
+    Attempt a cheap repair: refine existing code to fix failure_reason, then
+    execute. Returns a partial result dict on success, None if repair fails
+    (caller should fall through to full generate_transform_code loop).
+
+    Saves 2-3 LLM calls vs full regeneration on most simple runtime errors
+    (import errors, null handling, type casting issues).
+    """
+    print("  [transformer] targeted repair: calling refine_transform_code ...", flush=True)
+    try:
+        refined = await mcp.call("refine_transform_code", {
+            "original_code": generated_code,
+            "nlp_instruction": f"Fix this runtime error: {failure_reason}",
+            "profile": state.get("profile", {}),
+            "domain_context": state.get("domain_context", {}),
+        })
+    except Exception as exc:
+        print(f"  [transformer] targeted repair: refine failed: {exc}", flush=True)
+        return None
+
+    revised_code = refined.get("revised_code", "")
+    if not revised_code:
+        return None
+
+    logger.tool_call(
+        span, "transformer", "refine_transform_code(repair)",
+        {"failure_len": len(failure_reason)},
+        {"changes": len(refined.get("changes_summary", []))},
+    )
+
+    print("  [transformer] targeted repair: calling execute_code ...", flush=True)
+    import tempfile
+    tmp_out = tempfile.mktemp(suffix=".parquet", prefix="repair_out_", dir="/tmp")
+    try:
+        exec_result = await mcp.call("execute_code", {
+            "code": revised_code,
+            "input_path": _get_input_path(state),
+            "output_path": tmp_out,
+        })
+    except Exception as exc:
+        print(f"  [transformer] targeted repair: execute failed: {exc}", flush=True)
+        return None
+
+    logger.tool_call(
+        span, "transformer", "execute_code(repair)",
+        {"code_lines": len(revised_code.splitlines())},
+        {"success": exec_result.get("success"), "rows_in": exec_result.get("rows_input")},
+    )
+
+    if not exec_result.get("success"):
+        print(f"  [transformer] targeted repair: execution failed, falling back to full regen", flush=True)
+        return None
+
+    # Persist output
+    print("  [transformer] targeted repair: calling write_dataset ...", flush=True)
+    write_result = await mcp.call("write_dataset", {
+        "data_path": tmp_out,
+        "output_name": "transformed",
+        "run_id": state["run_id"],
+    })
+    output_path = write_result.get("output_path", "")
+    if not output_path:
+        return None
+
+    logger.tool_call(
+        span, "transformer", "write_dataset(repair)",
+        {},
+        {"output_path": output_path, "rows": write_result.get("row_count")},
+    )
+
+    print("  [transformer] targeted repair: success", flush=True)
+    return {
+        "generated_code": revised_code,
+        "output_path": output_path,
+        "rows_input": exec_result.get("rows_input", 0),
+        "rows_output": exec_result.get("rows_output", 0),
+    }
 
 
 def _summarise_input(tool_name: str, args: dict) -> dict:

@@ -156,7 +156,7 @@ async def get_run(run_id: str):
 
 @router.get("/runs/{run_id}/events")
 async def run_events(run_id: str):
-    q = subscribe(run_id)
+    q = await subscribe(run_id)
 
     async def event_stream():
         try:

@@ -55,6 +55,9 @@ HITL_TIMEOUT: float = _positive_float("HITL_TIMEOUT_SECONDS", "1800.0")
 # ---------------------------------------------------------------------------
 
 
+_WAITING_KEY = "hitl:waiting"   # Redis set — run_ids currently at HITL checkpoint
+
+
 def _code_key(run_id: str) -> str:
     return f"hitl:{run_id}:code"
 
@@ -74,6 +77,41 @@ async def _get(key: str) -> dict | None:
     if raw is None:
         return None
     return json.loads(raw)
+
+
+async def _mark_waiting(run_id: str) -> None:
+    """Register run_id as waiting at a HITL checkpoint."""
+    try:
+        redis = await get_redis_client()
+        await redis.sadd(_WAITING_KEY, run_id)
+        # TTL on the set: if the server crashes mid-wait, the entry ages out
+        await redis.expire(_WAITING_KEY, HITL_TTL)
+    except Exception:
+        pass
+
+
+async def _clear_waiting(run_id: str) -> None:
+    """Remove run_id from the waiting set after decision or timeout."""
+    try:
+        redis = await get_redis_client()
+        await redis.srem(_WAITING_KEY, run_id)
+    except Exception:
+        pass
+
+
+async def list_waiting_runs() -> list[str]:
+    """
+    Return all run_ids currently waiting at a HITL checkpoint.
+
+    Used by hitl_approve.py and the /hitl/pending API endpoint to show
+    operators which runs need attention.
+    """
+    try:
+        redis = await get_redis_client()
+        members = await redis.smembers(_WAITING_KEY)
+        return [m.decode() if isinstance(m, bytes) else m for m in members]
+    except Exception:
+        return []
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +154,21 @@ class DriftApproveRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 hitl_router = APIRouter()
+
+
+# -- Pending runs endpoint ---------------------------------------------------
+
+
+@hitl_router.get("/pending")
+async def list_pending() -> dict:
+    """
+    List all run_ids currently waiting at a HITL checkpoint.
+
+    Use this endpoint (or `python scripts/hitl_approve.py --list`) to see
+    which runs need human attention before the pipeline can proceed.
+    """
+    waiting = await list_waiting_runs()
+    return {"waiting_runs": waiting, "count": len(waiting)}
 
 
 # -- Code review endpoints ---------------------------------------------------
@@ -353,42 +406,49 @@ async def hitl_code_checkpoint(
         },
     )
 
+    # Register as waiting so hitl_approve.py / /hitl/pending can list this run
+    await _mark_waiting(run_id)
+
     deadline = time.time() + HITL_TIMEOUT
 
-    while time.time() < deadline:
-        await asyncio.sleep(HITL_POLL_INTERVAL)
-        data = await _get(_code_key(run_id))
-        if data is None:
-            raise TimeoutError(f"HITL checkpoint expired for run {run_id}")
+    try:
+        while time.time() < deadline:
+            await asyncio.sleep(HITL_POLL_INTERVAL)
+            data = await _get(_code_key(run_id))
+            if data is None:
+                raise TimeoutError(f"HITL checkpoint expired for run {run_id}")
 
-        state = data["state"]
+            state = data["state"]
 
-        if state == "confirmed":
-            return {
-                "approved": True,
-                "code": data.get("revised_code") or data["code"],
-                "nlp_instruction": data.get("nlp_instruction"),
-                "needs_refinement": False,
-            }
+            if state == "confirmed":
+                return {
+                    "approved": True,
+                    "code": data.get("revised_code") or data["code"],
+                    "nlp_instruction": data.get("nlp_instruction"),
+                    "needs_refinement": False,
+                }
 
-        if state == "rejected":
-            raise ValueError(f"HITL code checkpoint rejected for run {run_id}")
+            if state == "rejected":
+                raise ValueError(f"HITL code checkpoint rejected for run {run_id}")
 
-        if state == "approved_with_instruction":
-            # Return to agent so it can call refine_transform_code
-            return {
-                "approved": True,
-                "code": data["code"],
-                "nlp_instruction": data["nlp_instruction"],
-                "needs_refinement": True,
-            }
+            if state == "approved_with_instruction":
+                # Return to agent so it can call refine_transform_code
+                return {
+                    "approved": True,
+                    "code": data["code"],
+                    "nlp_instruction": data["nlp_instruction"],
+                    "needs_refinement": True,
+                }
 
-        # Still pending / awaiting_confirm — keep polling
-        continue
+            # Still pending / awaiting_confirm — keep polling
+            continue
 
-    raise TimeoutError(
-        f"HITL timeout after {HITL_TIMEOUT}s for run {run_id}"
-    )
+        raise TimeoutError(
+            f"HITL timeout after {HITL_TIMEOUT}s for run {run_id}"
+        )
+    finally:
+        # Always deregister — whether resolved, timed out, or rejected
+        await _clear_waiting(run_id)
 
 
 async def hitl_confirm_after_refinement(run_id: str) -> dict[str, Any]:

@@ -17,6 +17,9 @@ from db import get_duckdb_conn, get_postgres_pool
 # sample_data
 # ---------------------------------------------------------------------------
 
+_STRATIFIED_THRESHOLD = 50_000  # rows — above this use stratified sampling
+
+
 async def sample_data(
     source_path: str,
     source_type: str,
@@ -25,9 +28,14 @@ async def sample_data(
     """
     Draw a representative sample from the source dataset.
 
+    For datasets <= 50K rows: random SAMPLE (fast, unbiased).
+    For datasets > 50K rows: stratified — first N/3 + last N/3 + random N/3.
+    This captures temporal patterns and boundary values that pure random misses,
+    at no extra token cost since the sample size stays the same.
+
     Use when: you need rows to pass to compute_profile or detect_schema.
-    Do NOT use when: you need full-dataset statistics — use compute_profile
-    directly on the source path instead.
+    Do NOT use when: you need full-dataset statistics — compute_profile handles
+    that directly on the source path.
     Returns: sample (list[dict]), actual_sample_size (int).
     """
     conn = get_duckdb_conn()
@@ -35,14 +43,47 @@ async def sample_data(
         _register_source(conn, source_path, source_type)
         total = conn.execute("SELECT COUNT(*) FROM src").fetchone()[0]
         limit = min(sample_size, total)
-        rows = conn.execute(
-            f"SELECT * FROM src USING SAMPLE {limit} ROWS"
-        ).df().to_dict(orient="records")
-        # Convert any non-serialisable types to strings
+
+        if total > _STRATIFIED_THRESHOLD:
+            rows = _stratified_sample(conn, total, limit)
+        else:
+            rows = conn.execute(
+                f"SELECT * FROM src USING SAMPLE {limit} ROWS"
+            ).df().to_dict(orient="records")
+
         rows = _serialise_rows(rows)
         return {"sample": rows, "actual_sample_size": len(rows)}
     finally:
         conn.close()
+
+
+def _stratified_sample(conn, total: int, sample_size: int) -> list[dict]:
+    """
+    Return head + tail + random rows, deduplicated.
+
+    Each bucket is sample_size // 3 rows. Random bucket gets the remainder
+    to ensure total == sample_size (modulo deduplication).
+    """
+    import pandas as pd
+
+    per_bucket = sample_size // 3
+    remainder = sample_size - per_bucket * 2
+
+    head = conn.execute(
+        f"SELECT * FROM src LIMIT {per_bucket}"
+    ).df()
+
+    tail_offset = max(0, total - per_bucket)
+    tail = conn.execute(
+        f"SELECT * FROM src LIMIT {per_bucket} OFFSET {tail_offset}"
+    ).df()
+
+    random_rows = conn.execute(
+        f"SELECT * FROM src USING SAMPLE {remainder} ROWS"
+    ).df()
+
+    combined = pd.concat([head, tail, random_rows], ignore_index=True).drop_duplicates()
+    return combined.to_dict(orient="records")
 
 
 # ---------------------------------------------------------------------------
@@ -405,3 +446,15 @@ def _safe_str(val) -> str | None:
     if val is None:
         return None
     return str(val)
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "sample_data": sample_data,
+    "compute_profile": compute_profile,
+    "detect_schema": detect_schema,
+    "compare_schemas": compare_schemas,
+}

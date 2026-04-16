@@ -191,3 +191,14 @@ async def generate_dbt_schema_yml(
         f.write(yml_content)
 
     return {"yml_content": yml_content, "file_path": str(file_path)}
+
+
+# ---------------------------------------------------------------------------
+# Tool registry
+# ---------------------------------------------------------------------------
+
+TOOLS: dict = {
+    "search_transform_library": search_transform_library,
+    "save_to_library": save_to_library,
+    "generate_dbt_schema_yml": generate_dbt_schema_yml,
+}

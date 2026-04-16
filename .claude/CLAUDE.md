@@ -65,11 +65,16 @@ Profiler → [drift checkpoint] → Domain detection → Transformer → Quality
 - If domain_confidence < 0.60 → pause at HITL domain checkpoint
 
 **Transformer agent** — ReAct loop, max 6 tool calls
-- If incremental: detect_new_rows (watermark filter) first
-- search_transform_library → generate_transform_code (LLM)
-  → HITL checkpoint (approve / NLP instruction / reject)
-  → [refine_transform_code if NLP instruction given]
-  → execute_code (sandbox) → write_dataset
+- **Targeted repair fast-path (retry_count > 0 only):** if generated_code
+  exists, try refine_transform_code(failure_reason) → execute_code →
+  write_dataset directly. Falls back to full ReAct loop only if repair fails.
+  Saves 2–3 LLM calls on common retry causes (import errors, null handling).
+- Normal path: [detect_new_rows if incremental] → search_transform_library
+  → generate_transform_code (LLM) → HITL checkpoint (approve / NLP /
+  reject) → [refine_transform_code if NLP instruction given]
+  → execute_code (sandbox) → **verify_transform_intent (Haiku, 5-row sample)**
+  → write_dataset
+- Context window: trim_messages(keep_first=1, keep_last=10) on every turn
 - Writes: generated_code, transformations_applied, output_path,
   rows_input, rows_output, pipeline_script to state
 
@@ -79,6 +84,7 @@ Profiler → [drift checkpoint] → Domain detection → Transformer → Quality
   → explain_anomalies (LLM → plain English explanation)
   → write_quality_report
   → save_to_library (only if all checks pass AND code is reusable)
+- Context window: trim_messages(keep_first=1, keep_last=10) on every turn
 - Writes: quality_checks, anomaly_summary, anomaly_explanations,
   quality_passed, quality_report_path, status to state
 
@@ -88,20 +94,17 @@ Profiler → [drift checkpoint] → Domain detection → Transformer → Quality
 - Writes: catalogue_id, lineage_graph, dbt_model_path,
   dbt_schema_path, dbt_tests_path to state
 
-### MCP server — 23 tools across 7 domains
+### MCP server — 25 tools across 7 domains
 
 | Domain | Tools |
 |--------|-------|
 | source (4) | connect_csv, connect_postgres, connect_api, detect_new_rows |
 | profiling (4) | sample_data, compute_profile, detect_schema, compare_schemas |
-| transform (4) | generate_transform_code, refine_transform_code, execute_code, write_dataset |
+| transform (5) | generate_transform_code, refine_transform_code, execute_code, write_dataset, **verify_transform_intent** |
 | quality (4) | run_quality_checks, detect_anomalies, explain_anomalies, write_quality_report |
-| catalogue (4) | write_catalogue_entry, generate_lineage_graph, generate_dbt_model, read_catalogue |
+| catalogue (5) | write_catalogue_entry, generate_lineage_graph, generate_dbt_model, read_catalogue, generate_dbt_tests |
 | library (3) | search_transform_library, save_to_library, generate_dbt_schema_yml |
 | domain (2) | detect_domain, load_domain_rules |
-
-**One additional tool in next phase:** generate_dbt_tests (currently in catalogue
-agent's 5th call — implement after the above 23 are working)
 
 ### Infrastructure (all local Docker)
 
@@ -328,3 +331,31 @@ Phase 7 — Tests + validation
 10. Watermark values must be persisted to the pipeline_runs table in Postgres
     after every successful incremental run. Read from there at the start of
     the next incremental run, not from in-memory state.
+
+11. Every tool module must export a `TOOLS: dict` mapping name → function at
+    the bottom of the file. `server.py` builds `TOOL_HANDLERS` by merging all
+    seven TOOLS dicts. Never add a tool to `TOOL_HANDLERS` directly — add it
+    to the module's `TOOLS` dict only.
+
+12. Every agent must call its boundary validator before doing any work:
+    - domain agent → `require_profiler_output(state)`
+    - transformer agent → `require_domain_output(state)`
+    - quality agent → `require_transformer_output(state)` (after output_path check)
+    - catalogue agent → `require_quality_output(state)`
+    These raise `StateBoundaryError` with a clear message if upstream data
+    is absent. Never skip these calls.
+
+13. Targeted repair must be attempted before full code regeneration. When
+    `retry_count > 0` and `generated_code` is set, call `_try_targeted_repair`
+    first. Only fall through to the full ReAct loop if repair returns None.
+
+14. `verify_transform_intent` must be called after every successful `execute_code`
+    call. It uses Haiku, samples 5 rows, and costs ~$0.0001. A semantic
+    mismatch increments retry_count and returns `status="retrying"` — the same
+    path as an execution failure.
+
+15. Use Haiku for narrow classification tasks: `_llm_classify` in domain_tools
+    and `verify_transform_intent` in transform_tools. Use Sonnet only for
+    generate_transform_code, refine_transform_code, explain_anomalies,
+    write_catalogue_entry, generate_dbt_model. Do not upgrade a Haiku call
+    to Sonnet without a clear quality justification.
